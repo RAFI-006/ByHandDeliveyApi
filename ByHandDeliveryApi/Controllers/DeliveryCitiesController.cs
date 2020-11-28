@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ByHandDeliveryApi.Models;
 using ByHandDeliveryApi.GenericResponses;
 using ByHandDeliveryApi.Services;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -140,6 +142,59 @@ namespace ByHandDeliveryApi.Controllers
             return response.ToHttpResponse();
 
         }
+
+        [HttpPost("PostOtp")]
+        public async Task<IActionResult> PostOtp(string number)
+        {
+            AzureBlobService service = new AzureBlobService();
+            GenericResponse<string> response = new GenericResponse<string>();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                string accountSid = "AC07f7179f1b520b541532521565d1965c";
+                string authToken = "675f83ea588c2a055fb30114656e982a";
+
+                
+                    
+                
+                TwilioClient.Init(accountSid, authToken);
+
+                var message = MessageResource.Create(
+                    body: "1234",
+                    from: new Twilio.Types.PhoneNumber("+12052360258"),
+                    to: new Twilio.Types.PhoneNumber(number)
+                );
+
+                if (!string.IsNullOrEmpty(message.Sid))
+                {
+                    response.HasError = false;
+                    response.Message = "Sucesss";
+                    response.Result = message.Sid;
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.Message = "Failed";
+                    
+
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.InnerException.ToString();
+
+
+            }
+
+            return response.ToHttpResponse();
+
+        }
+
 
 
         // POST: api/DeliveryCities
