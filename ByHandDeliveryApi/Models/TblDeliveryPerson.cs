@@ -32,6 +32,12 @@ namespace ByHandDeliveryApi.Models
         public string CanceledChequeImage { get; set; }
         public bool? IsActive { get; set; }
         public string Password { get; set; }
+        public string DocumentFrontImage { get; set; }
+        public string DocumentBackImage { get; set; }
+        public string ProfileImage { get; set; }
+        public DateTime CreatedDate { get; set; }
+
+
 
         public ICollection<TblOrders> TblOrders { get; set; }
     }

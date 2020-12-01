@@ -25,6 +25,8 @@ namespace ByHandDeliveryApi.Models
         public DateTime? CreditCardExpiry { get; set; }
         public string CreditCardCvv { get; set; }
         public bool? IsActive { get; set; }
+        public DateTime CreatedDate { get; set; }
+
 
         public ICollection<TblOrders> TblOrders { get; set; }
     }

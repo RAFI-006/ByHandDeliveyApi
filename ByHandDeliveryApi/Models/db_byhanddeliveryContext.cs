@@ -41,6 +41,7 @@ namespace ByHandDeliveryApi.Models
                 entity.ToTable("tbl_Customers");
 
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(1000)
@@ -111,9 +112,9 @@ namespace ByHandDeliveryApi.Models
                 entity.ToTable("tbl_DeliveryPerson");
 
                 entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
-
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
                 entity.Property(e => e.AadhaarImage)
-                    .HasMaxLength(100)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
                 entity.Property(e => e.AadhaarNo)
@@ -141,7 +142,7 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.CanceledChequeImage)
-                    .HasMaxLength(100)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
                 entity.Property(e => e.City)
@@ -153,8 +154,17 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.DrivingLicenceImage)
-                    .HasMaxLength(100)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
+                entity.Property(e => e.ProfileImage)
+                   .HasMaxLength(500)
+                   .IsUnicode(false);
+                entity.Property(e => e.DocumentBackImage)
+                   .HasMaxLength(500)
+                   .IsUnicode(false);
+                entity.Property(e => e.DocumentFrontImage)
+                   .HasMaxLength(500)
+                   .IsUnicode(false);
 
                 entity.Property(e => e.DrivingLicenceNo)
                     .HasMaxLength(50)
@@ -252,6 +262,7 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Cod).HasColumnName("COD");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ContactPerson)
                     .HasMaxLength(100)

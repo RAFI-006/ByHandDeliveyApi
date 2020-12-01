@@ -92,6 +92,36 @@ namespace ByHandDeliveryApi.Controllers
         }
 
 
+        [HttpGet("IsCustomerRegistered")]
+        public IActionResult IsUserRegisered(string number)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            GenericResponse<bool> responses = new GenericResponse<bool>();
+
+            try
+            {
+                var data = TblCustomersExists(number);
+
+                responses.HasError = false;
+                responses.Result = data;
+                responses.Message = _successMsg;
+
+
+            }
+            catch (Exception e)
+            {
+                responses.HasError = false;
+                responses.Message = e.InnerException.ToString();
+
+            }
+
+            return responses.ToHttpResponse();
+        }
+
         // GET: api/Customers/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTblCustomers([FromRoute] int id)

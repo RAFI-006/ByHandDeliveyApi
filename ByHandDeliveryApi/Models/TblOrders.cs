@@ -31,7 +31,9 @@ namespace ByHandDeliveryApi.Models
         public bool? Cod { get; set; }
         public bool? FromTheBalance { get; set; }
         public bool? ByCreditCard { get; set; }
-        public int? Status { get; set; }  
+        public int? Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+
 
         public TblCustomers Customer { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }

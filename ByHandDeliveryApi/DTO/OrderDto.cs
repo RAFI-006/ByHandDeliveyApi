@@ -29,6 +29,8 @@ namespace ByHandDeliveryApi.DTO
         public bool? FromTheBalance { get; set; }
         public bool? ByCreditCard { get; set; }
         public int? Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+
 
         public CustomersDto Customer { get; set; }
         public DeliveryPersonDto DeliveryPerson { get; set; }

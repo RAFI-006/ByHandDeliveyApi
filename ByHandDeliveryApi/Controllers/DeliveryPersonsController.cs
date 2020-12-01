@@ -187,6 +187,35 @@ namespace ByHandDeliveryApi.Controllers
             return responses.ToHttpResponse();
         }
 
+        [HttpGet("IsNumberRegistered")]
+        public IActionResult IsUserRegisered(string number)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            GenericResponse<bool> responses = new GenericResponse<bool>();
+
+            try
+            {
+                var data = TblDeliveryPersonExists(number);
+
+                responses.HasError = false;
+                responses.Result = data;
+                responses.Message = _successMsg;
+
+
+            }
+            catch (Exception e)
+            {
+                responses.HasError = false;
+                responses.Message = e.InnerException.ToString();
+
+            }
+
+            return responses.ToHttpResponse();
+        }
         // DELETE: api/DeliveryPersons/5
         //[HttpDelete("{id}")]
         //public async Task<IActionResult> DeleteTblDeliveryPerson([FromRoute] int id)
