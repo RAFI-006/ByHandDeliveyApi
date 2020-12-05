@@ -15,6 +15,7 @@ using ByHandDeliveryApi.DataModel.FireBase;
 using ByHandDeliveryApi.Services.GooglePlaces;
 using ByHandDeliveryApi.DataModel.GooglePlaces;
 using ByHandDeliveryApi.DataModel.GooglePlaces.ByHandDeliveryApi.DataModel.GooglePlaces;
+using ByHandDeliveryApi.DataModel;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -220,8 +221,10 @@ namespace ByHandDeliveryApi.Controllers
 
                 PlacesAutoCompleteResponse result = await _googleService.GetAutoCompleteGooglePlaces(place);
 
+
                 if (result.status == "OK")
                 {
+
                     response.HasError = false;
                     response.Message = _successMsg;
                     response.Result = result.predictions;
@@ -288,6 +291,48 @@ namespace ByHandDeliveryApi.Controllers
 
             return response.ToHttpResponse();
         }
+
+
+        [HttpPost("GetDistanceBetweenTwoPoints")]
+        public async Task<IActionResult> GetDistanceBetweenTwoPoints([FromBody] LocationRequestModel model)
+        {
+            GenericResponse<string> response = new GenericResponse<string>();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+
+
+                var result = GetDistanceFromLatLonInKm(model.SourceLat, model.SourceLong, model.DestLat, model.DestLong);
+
+                if (result!=null)
+                {
+                    response.HasError = false;
+                    response.Message = _successMsg;
+                    response.Result = result.ToString();
+
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.Message = "Place Not Found";
+                }
+
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.InnerException.ToString();
+
+            }
+
+            return response.ToHttpResponse();
+        }
+
 
         [HttpGet("TestFireBase")]
         public async Task<IActionResult> TestFireBaseNotification(string title,string body)
@@ -371,6 +416,27 @@ namespace ByHandDeliveryApi.Controllers
         private bool TblDeliveryCityExists(int id)
         {
             return _context.TblDeliveryCity.Any(e => e.DeliveryCityId == id);
+        }
+
+
+        double GetDistanceFromLatLonInKm( double lat1, double lon1,  double lat2, double lon2)
+        {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+              Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+              Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) *
+              Math.Sin(dLon / 2) * Math.Sin(dLon / 2)
+              ;
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            var d = R * c; // Distance in km
+            return d;
+        }
+
+        double deg2rad(double deg)
+        {
+            return deg * (Math.PI / 180);
         }
     }
 }

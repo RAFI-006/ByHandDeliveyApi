@@ -47,6 +47,11 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(1000)
                     .IsUnicode(false);
 
+                entity.Property(e => e.FcmToken)
+                            .HasMaxLength(1000)
+                            .IsUnicode(false);
+
+
                 entity.Property(e => e.City)
                     .HasMaxLength(100)
                     .IsUnicode(false);
@@ -223,6 +228,8 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.DeliveryDate).HasColumnType("date");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
 
                 entity.Property(e => e.DeliveryFromTime)
                     .HasMaxLength(50)
@@ -230,6 +237,9 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.DeliveryToTime)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Time)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InternalOrderNo)
@@ -240,6 +250,15 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Longitude)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Latitude)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.PinCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
 
                 entity.HasOne(d => d.Order)
@@ -267,6 +286,23 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.ContactPerson)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Time)
+                   .HasMaxLength(100)
+                   .IsUnicode(false);
+
+                entity.Property(e => e.FromLat)
+                  .HasMaxLength(100)
+                  .IsUnicode(false);
+                entity.Property(e => e.FromLong)
+                  .HasMaxLength(100)
+                  .IsUnicode(false);
+                entity.Property(e => e.Distance)
+                  .HasMaxLength(50)
+                  .IsUnicode(false);
+                entity.Property(e => e.PinCode)
+                  .HasMaxLength(50)
+                  .IsUnicode(false);
 
                 entity.Property(e => e.ContactPersonMobile)
                    .HasMaxLength(50)

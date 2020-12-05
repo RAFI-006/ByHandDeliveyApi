@@ -24,6 +24,7 @@ namespace ByHandDeliveryApi.DTO
         public string CreditCardCvv { get; set; }
         public bool? IsActive { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string FcmToken { get; set; }
 
 
 

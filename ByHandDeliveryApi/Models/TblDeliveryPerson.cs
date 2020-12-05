@@ -36,6 +36,7 @@ namespace ByHandDeliveryApi.Models
         public string DocumentBackImage { get; set; }
         public string ProfileImage { get; set; }
         public DateTime CreatedDate { get; set; }
+      
 
 
 
