@@ -9,6 +9,7 @@ using ByHandDeliveryApi.Models;
 using AutoMapper;
 using ByHandDeliveryApi.GenericResponses;
 using ByHandDeliveryApi.DTO;
+using ByHandDeliveryApi.DataModel;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -53,6 +54,60 @@ namespace ByHandDeliveryApi.Controllers
 
             return response.ToHttpResponse();
         }
+
+
+        [HttpPost("FilterOrders")]
+        public IActionResult FilterOrders([FromBody]FilterOrderModel model)
+        {
+            var response = new GenericResponse<List<OrderDto>>();
+            try
+            {
+                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).ToList().Where(p => p.Status == 0).ToList();
+
+                if (model.City == null && model.Distance == null)
+                {
+                    response.Message = SucessMessege;
+                    response.HasError = false;
+                    response.Result = _mappper.Map<List<OrderDto>>(data);
+                }
+                else if (model.City == null) {
+
+                    var result = data.Where(p => Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.Status == 0).ToList();
+
+
+                    response.Message = SucessMessege;
+                    response.HasError = false;
+                    response.Result = _mappper.Map<List<OrderDto>>(result);
+                }
+                else if (model.Distance == null)
+                {
+
+                    var result = data.Where(p => p.City == model.City && p.Status==0).ToList();
+
+                    response.Message = SucessMessege;
+                    response.HasError = false;
+                    response.Result = _mappper.Map<List<OrderDto>>(result);
+                }
+                else
+                {
+
+                    var result = data.Where(p => p.City == model.City && Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.Status == 0).ToList();
+
+                    response.Message = SucessMessege;
+                    response.HasError = false;
+                    response.Result = _mappper.Map<List<OrderDto>>(result);
+                }
+
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = true;
+            }
+
+            return response.ToHttpResponse();
+        }
+
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
@@ -211,9 +266,9 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.Customer).ToList();
+                var data = _context.TblOrders.Include(p => p.Customer).Include(p=>p.TblOrderDeliveryAddress).ToList();
 
-                var tblOrders = data.Where(p => p.DeliveryPersonId == id).ToList();
+                var tblOrders = data.Where(p => p.DeliveryPersonId == id && p.DeliveryPersonId!=null).ToList();
 
                 if (tblOrders == null)
                 {
@@ -222,7 +277,7 @@ namespace ByHandDeliveryApi.Controllers
                 }
                 else
                 {
-                    response.Result = _mappper.Map<List<OrderDto>>(data);
+                    response.Result = _mappper.Map<List<OrderDto>>(tblOrders);
                     response.Message = SucessMessege;
                     response.HasError = false;
                 }
@@ -240,26 +295,55 @@ namespace ByHandDeliveryApi.Controllers
         }
 
 
-        //// DELETE: api/Orders/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteTblOrders([FromRoute] int id)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        // DELETE: api/Orders/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTblOrders([FromRoute] int id)
+        {
+            var response = new GenericResponse<string>();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
-        //    var tblOrders = await _context.TblOrders.FindAsync(id);
-        //    if (tblOrders == null)
-        //    {
-        //        return NotFound();
-        //    }
+                var tblOrders = await _context.TblOrders.FindAsync(id);
+                if (tblOrders == null)
+                {
+                    response.HasError = true;
+                    response.Message = "Orders not found";
 
-        //    _context.TblOrders.Remove(tblOrders);
-        //    await _context.SaveChangesAsync();
+                }
+                else
+                {
 
-        //    return Ok(tblOrders);
-        //}
+                    var deliveryData = _context.TblOrderDeliveryAddress.Where(p => p.OrderId == id).FirstOrDefault();
+
+                    if (deliveryData != null)
+                    {
+                        _context.TblOrderDeliveryAddress.Remove(deliveryData);
+                        _context.TblOrders.Remove(tblOrders);
+                        await _context.SaveChangesAsync();
+
+                        response.HasError = false;
+                        response.Message = "Successfully deleted orderId" + " " + id;
+
+                    }
+                }
+         
+            }
+             catch(Exception e)
+            {
+
+                response.HasError = true;
+                response.Message = e.InnerException.ToString();
+            }
+
+
+
+
+            return response.ToHttpResponse();
+        }
 
         private bool TblOrdersExists(int id)
         {

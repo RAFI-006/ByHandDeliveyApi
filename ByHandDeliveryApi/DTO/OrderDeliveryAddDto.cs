@@ -22,6 +22,7 @@ namespace ByHandDeliveryApi.DTO
         public string Longitude { get; set; }
         public string PinCode { get; set; }
         public string Time { get; set; }
+        public string DropLocality { get; set; }
 
     }
 }

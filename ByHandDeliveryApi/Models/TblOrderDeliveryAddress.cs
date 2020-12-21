@@ -20,7 +20,9 @@ namespace ByHandDeliveryApi.Models
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string PinCode { get; set; }
+        public string DropLocality { get; set;}
         public string Time { get; set; }
+
 
 
 

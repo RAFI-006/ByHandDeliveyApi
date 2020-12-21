@@ -223,6 +223,9 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DropLocality)
+                 .IsUnicode(false);
+
                 entity.Property(e => e.DeliveryAddress)
                     .HasMaxLength(2000)
                     .IsUnicode(false);
@@ -294,9 +297,21 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.FromLat)
                   .HasMaxLength(100)
                   .IsUnicode(false);
+                entity.Property(e => e.City)
+                  .HasMaxLength(200)
+                 .IsUnicode(false);
+
+                
+
                 entity.Property(e => e.FromLong)
                   .HasMaxLength(100)
                   .IsUnicode(false);
+
+
+                entity.Property(e => e.PaymentFrom)
+                  .IsUnicode(false);
+
+
                 entity.Property(e => e.Distance)
                   .HasMaxLength(50)
                   .IsUnicode(false);
