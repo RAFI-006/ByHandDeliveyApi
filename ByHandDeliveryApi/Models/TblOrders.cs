@@ -39,6 +39,7 @@ namespace ByHandDeliveryApi.Models
         public string PinCode { get; set; }
         public string City { get; set; }
         public string PaymentFrom { get; set; }
+        public string ProductImage { get; set;}
 
         public DateTime CreatedDate { get; set; }
 

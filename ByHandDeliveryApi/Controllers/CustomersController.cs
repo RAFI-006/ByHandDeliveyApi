@@ -57,7 +57,7 @@ namespace ByHandDeliveryApi.Controllers
 
 
         [HttpGet("Login")]
-        public IActionResult Login( string phone,string pass)
+        public IActionResult Login( string phone,string pass,string fcmtoken)
         {
             if (!ModelState.IsValid)
             {
@@ -75,9 +75,24 @@ namespace ByHandDeliveryApi.Controllers
                 }
                 else
                 {
-                    response.HasError = false;
-                    response.Message = _successMsg;
-                    response.Result = _mapper.Map<CustomersDto>(tblCustomers);
+                    if (fcmtoken == null)
+                    {
+
+                        response.HasError = false;
+                        response.Message = _successMsg;
+                        response.Result = _mapper.Map<CustomersDto>(tblCustomers);
+                    }
+                    else
+                    {
+                        tblCustomers.FcmToken = fcmtoken;
+                        _context.TblCustomers.Update(tblCustomers);
+                        _context.SaveChanges();
+                        response.HasError = false;
+                        response.Message = _successMsg;
+                        var data = _context.TblCustomers.Where(p => p.CustomerId == tblCustomers.CustomerId).FirstOrDefault();
+                        response.Result = _mapper.Map<CustomersDto>(data);
+                    }
+                    
                 }
             }
             catch (Exception e)

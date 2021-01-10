@@ -34,6 +34,10 @@ namespace ByHandDeliveryApi
         {
             //  services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            });
             services.AddMvc(options => {
 
 
@@ -57,6 +61,8 @@ namespace ByHandDeliveryApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors(options => options.AllowAnyOrigin());
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>

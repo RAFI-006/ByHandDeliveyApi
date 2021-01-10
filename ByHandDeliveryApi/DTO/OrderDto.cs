@@ -37,6 +37,7 @@ namespace ByHandDeliveryApi.DTO
         public string City { get; set; }
         public string CreatedDate { get; set; }
         public string PaymentFrom { get; set; }
+        public string ProductImage { get; set; }
 
 
         public CustomersDto Customer { get; set; }

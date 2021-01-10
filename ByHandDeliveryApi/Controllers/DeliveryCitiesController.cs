@@ -335,7 +335,7 @@ namespace ByHandDeliveryApi.Controllers
 
 
         [HttpGet("TestFireBase")]
-        public async Task<IActionResult> TestFireBaseNotification(string title,string body)
+        public async Task<IActionResult> TestFireBaseNotification(string title,string body,string fcmToken)
         {
             GenericResponse<string> response = new GenericResponse<string>();
             if (!ModelState.IsValid)
@@ -349,7 +349,7 @@ namespace ByHandDeliveryApi.Controllers
              
                
 
-                var result = await FireBaseService.PostNotifications(Ids,title,body);
+                var result = await FireBaseService.PostNotifications(fcmToken,title,body);
 
                 if (result.Success == 1)
                 {

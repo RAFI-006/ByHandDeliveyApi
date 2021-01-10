@@ -20,6 +20,7 @@ namespace ByHandDeliveryApi.Models
         public virtual DbSet<TblDeliveryPerson> TblDeliveryPerson { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
+        public virtual DbSet<TblBaseConfig> TblBaseConfig { get; set; } 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -34,6 +35,18 @@ namespace ByHandDeliveryApi.Models
         {
             modelBuilder.HasAnnotation("Relational:DefaultSchema", "hand");
 
+            modelBuilder.Entity<TblBaseConfig>(entity=> {
+                entity.HasKey(e => e.Id);
+                entity.ToTable("tbl_BaseConfig");
+
+                entity.Property(e => e.Id).HasColumnName("Id");
+                entity.Property(e => e.BaseRate).HasColumnName("BaseRate");
+                entity.Property(e => e.BaseRatePerKmAboveKg).HasColumnName("BaseRatePerKmAboveKg");
+                entity.Property(e => e.BaseRatePerKmBelowKg).HasColumnName("BaseRatePerKmBelowKg");
+                entity.Property(e => e.AppVersion).HasColumnName("AppVersion");
+
+
+            });
             modelBuilder.Entity<TblCustomers>(entity =>
             {
                 entity.HasKey(e => e.CustomerId);
@@ -329,6 +342,10 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.GoodsType)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProductImage)
+                    
                     .IsUnicode(false);
 
                 entity.Property(e => e.InternalOrderNo)

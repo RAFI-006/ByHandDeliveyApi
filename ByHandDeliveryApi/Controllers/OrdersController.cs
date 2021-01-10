@@ -10,6 +10,7 @@ using AutoMapper;
 using ByHandDeliveryApi.GenericResponses;
 using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.DataModel;
+using ByHandDeliveryApi.Services;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -152,11 +153,23 @@ namespace ByHandDeliveryApi.Controllers
         [HttpPut]
         public async Task<IActionResult> PutTblOrders(TblOrders tblOrders)
         {
+            string _notificationMsg = "";
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            if (tblOrders.Status == 1)
+                _notificationMsg = "Your order has been accepted";
+            else if (tblOrders.Status == 2)
+            {
+                _notificationMsg = "Your order has been picked up from the pickup point " +
+                    tblOrders.PickupAddress;
+            }
+            else
+
+                _notificationMsg = "Your order is sucessfully delivered to the delivered adsress";
             var response = new GenericResponse<TblOrders>();
             try
             {
@@ -169,6 +182,18 @@ namespace ByHandDeliveryApi.Controllers
                     response.Result = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Where(p => p.OrderId == tblOrders.OrderId).FirstOrDefault();
                     response.Message = SucessMessege;
                     response.HasError = false;
+
+              
+                    var result = await FireBaseService.PostNotifications(response.Result.Customer.FcmToken, "OrderId" + tblOrders.OrderId, _notificationMsg);
+
+                    if (result.Success == 1)
+                    {
+
+                    }
+                    else
+                    {
+                
+                    }
                 }
                 else
                 {
@@ -180,7 +205,7 @@ namespace ByHandDeliveryApi.Controllers
             }
             catch (Exception e)
             {
-                response.Message = e.Message;
+                response.Message = e.InnerException.Message;
                 response.HasError = false;
 
             }
