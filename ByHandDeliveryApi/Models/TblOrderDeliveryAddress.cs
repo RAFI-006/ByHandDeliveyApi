@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace ByHandDeliveryApi.Models
-
 {
     public partial class TblOrderDeliveryAddress
     {
@@ -16,15 +15,12 @@ namespace ByHandDeliveryApi.Models
         public string ContactPerson { get; set; }
         public string InternalOrderNo { get; set; }
         public string Action { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string PinCode { get; set; }
-        public string DropLocality { get; set;}
         public string Time { get; set; }
-
-
-
+        public string DropLocality { get; set; }
 
         public TblOrders Order { get; set; }
     }

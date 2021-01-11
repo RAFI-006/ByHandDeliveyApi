@@ -15,12 +15,13 @@ namespace ByHandDeliveryApi.Models
         {
         }
 
+        public virtual DbSet<TblBaseConfig> TblBaseConfig { get; set; }
         public virtual DbSet<TblCustomers> TblCustomers { get; set; }
         public virtual DbSet<TblDeliveryCity> TblDeliveryCity { get; set; }
         public virtual DbSet<TblDeliveryPerson> TblDeliveryPerson { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
-        public virtual DbSet<TblBaseConfig> TblBaseConfig { get; set; } 
+        public virtual DbSet<TblOrderStatus> TblOrderStatus { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -35,18 +36,11 @@ namespace ByHandDeliveryApi.Models
         {
             modelBuilder.HasAnnotation("Relational:DefaultSchema", "hand");
 
-            modelBuilder.Entity<TblBaseConfig>(entity=> {
-                entity.HasKey(e => e.Id);
+            modelBuilder.Entity<TblBaseConfig>(entity =>
+            {
                 entity.ToTable("tbl_BaseConfig");
-
-                entity.Property(e => e.Id).HasColumnName("Id");
-                entity.Property(e => e.BaseRate).HasColumnName("BaseRate");
-                entity.Property(e => e.BaseRatePerKmAboveKg).HasColumnName("BaseRatePerKmAboveKg");
-                entity.Property(e => e.BaseRatePerKmBelowKg).HasColumnName("BaseRatePerKmBelowKg");
-                entity.Property(e => e.AppVersion).HasColumnName("AppVersion");
-
-
             });
+
             modelBuilder.Entity<TblCustomers>(entity =>
             {
                 entity.HasKey(e => e.CustomerId);
@@ -54,16 +48,10 @@ namespace ByHandDeliveryApi.Models
                 entity.ToTable("tbl_Customers");
 
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(1000)
                     .IsUnicode(false);
-
-                entity.Property(e => e.FcmToken)
-                            .HasMaxLength(1000)
-                            .IsUnicode(false);
-
 
                 entity.Property(e => e.City)
                     .HasMaxLength(100)
@@ -72,6 +60,8 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.Country)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.CreditCardCvv)
                     .HasColumnName("CreditCardCVV")
@@ -96,6 +86,8 @@ namespace ByHandDeliveryApi.Models
                     .HasColumnName("EmailID")
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.FcmToken).IsUnicode(false);
 
                 entity.Property(e => e.MobileNo)
                     .HasMaxLength(50)
@@ -130,10 +122,8 @@ namespace ByHandDeliveryApi.Models
                 entity.ToTable("tbl_DeliveryPerson");
 
                 entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-                entity.Property(e => e.AadhaarImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
+
+                entity.Property(e => e.AadhaarImage).IsUnicode(false);
 
                 entity.Property(e => e.AadhaarNo)
                     .HasMaxLength(50)
@@ -171,18 +161,15 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DocumentBackImage).IsUnicode(false);
+
+                entity.Property(e => e.DocumentFrontImage).IsUnicode(false);
+
                 entity.Property(e => e.DrivingLicenceImage)
                     .HasMaxLength(500)
                     .IsUnicode(false);
-                entity.Property(e => e.ProfileImage)
-                   .HasMaxLength(500)
-                   .IsUnicode(false);
-                entity.Property(e => e.DocumentBackImage)
-                   .HasMaxLength(500)
-                   .IsUnicode(false);
-                entity.Property(e => e.DocumentFrontImage)
-                   .HasMaxLength(500)
-                   .IsUnicode(false);
 
                 entity.Property(e => e.DrivingLicenceNo)
                     .HasMaxLength(50)
@@ -204,7 +191,6 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.Panimage)
                     .HasColumnName("PANImage")
-                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
@@ -218,6 +204,8 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.Pincode)
                     .HasMaxLength(10)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ProfileImage).IsUnicode(false);
             });
 
             modelBuilder.Entity<TblOrderDeliveryAddress>(entity =>
@@ -236,16 +224,13 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.DropLocality)
-                 .IsUnicode(false);
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DeliveryAddress)
                     .HasMaxLength(2000)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DeliveryDate).HasColumnType("date");
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
 
                 entity.Property(e => e.DeliveryFromTime)
                     .HasMaxLength(50)
@@ -254,11 +239,18 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.DeliveryToTime)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-                entity.Property(e => e.Time)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
+
+                entity.Property(e => e.DropLocality).IsUnicode(false);
 
                 entity.Property(e => e.InternalOrderNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Latitude)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Longitude)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -266,16 +258,15 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Longitude)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-                entity.Property(e => e.Latitude)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.OrderId).HasColumnName("OrderID");
+
                 entity.Property(e => e.PinCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-                entity.Property(e => e.OrderId).HasColumnName("OrderID");
+
+                entity.Property(e => e.Time)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.TblOrderDeliveryAddress)
@@ -291,61 +282,45 @@ namespace ByHandDeliveryApi.Models
                 entity.ToTable("tbl_Orders");
 
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
-                entity.Property(e => e.Status);
+
                 entity.Property(e => e.Action)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.City)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Cod).HasColumnName("COD");
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ContactPerson)
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Time)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
-
-                entity.Property(e => e.FromLat)
-                  .HasMaxLength(100)
-                  .IsUnicode(false);
-                entity.Property(e => e.City)
-                  .HasMaxLength(200)
-                 .IsUnicode(false);
-
-                
-
-                entity.Property(e => e.FromLong)
-                  .HasMaxLength(100)
-                  .IsUnicode(false);
-
-
-                entity.Property(e => e.PaymentFrom)
-                  .IsUnicode(false);
-
-
-                entity.Property(e => e.Distance)
-                  .HasMaxLength(50)
-                  .IsUnicode(false);
-                entity.Property(e => e.PinCode)
-                  .HasMaxLength(50)
-                  .IsUnicode(false);
-
                 entity.Property(e => e.ContactPersonMobile)
-                   .HasMaxLength(50)
-                   .IsUnicode(false);
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
 
-                entity.Property(e => e.GoodsType)
+                entity.Property(e => e.Distance)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FromLat)
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ProductImage)
-                    
+                entity.Property(e => e.FromLong)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GoodsType)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InternalOrderNo)
@@ -355,6 +330,10 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.MobileNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OrderStatusId).HasColumnName("OrderStatusID");
+
+                entity.Property(e => e.PaymentFrom).IsUnicode(false);
 
                 entity.Property(e => e.PickupAddress)
                     .HasMaxLength(8000)
@@ -374,11 +353,20 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PinCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProductImage).IsUnicode(false);
+
+                entity.Property(e => e.Time)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Weight)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.TblOrders)
                     .HasForeignKey(d => d.CustomerId)
@@ -389,6 +377,24 @@ namespace ByHandDeliveryApi.Models
                     .WithMany(p => p.TblOrders)
                     .HasForeignKey(d => d.DeliveryPersonId)
                     .HasConstraintName("FK_tbl_Orders_tbl_DeliveryPerson");
+
+                //entity.HasOne(d => d.OrderStatus)
+                //    .WithMany(p => p.TblOrders)
+                //    .HasForeignKey(d => d.OrderStatusId)
+                //    .HasConstraintName("FK_tbl_Orders_tbl_OrderStatus");
+            });
+
+            modelBuilder.Entity<TblOrderStatus>(entity =>
+            {
+                entity.HasKey(e => e.OrderStatusId);
+
+                entity.ToTable("tbl_OrderStatus");
+
+                entity.Property(e => e.OrderStatusId).HasColumnName("OrderStatusID");
+
+                entity.Property(e => e.OrderStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
         }
     }

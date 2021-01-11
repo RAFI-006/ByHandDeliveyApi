@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace ByHandDeliveryApi.Models
-
 {
     public partial class TblDeliveryCity
     {

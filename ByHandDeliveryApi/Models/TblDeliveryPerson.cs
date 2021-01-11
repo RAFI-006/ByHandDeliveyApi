@@ -1,5 +1,4 @@
-﻿using ByHandDeliveryApi.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ByHandDeliveryApi.Models
@@ -35,10 +34,7 @@ namespace ByHandDeliveryApi.Models
         public string DocumentFrontImage { get; set; }
         public string DocumentBackImage { get; set; }
         public string ProfileImage { get; set; }
-        public DateTime CreatedDate { get; set; }
-      
-
-
+        public DateTime? CreatedDate { get; set; }
 
         public ICollection<TblOrders> TblOrders { get; set; }
     }
