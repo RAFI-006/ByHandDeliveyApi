@@ -169,7 +169,7 @@ namespace ByHandDeliveryApi.Controllers
             }
             else
 
-                _notificationMsg = "Your order is sucessfully delivered to the delivered adsress";
+                _notificationMsg = "Your order is sucessfully delivered to the delivered address";
             var response = new GenericResponse<TblOrders>();
             try
             {
@@ -177,8 +177,9 @@ namespace ByHandDeliveryApi.Controllers
                 if (TblOrdersExists(tblOrders.OrderId))
                 {
                     _context.Entry(tblOrders).State = EntityState.Modified;
-
+                    _context.TblOrderStatus.Update(tblOrders.OrderStatus);
                     await _context.SaveChangesAsync();
+
                     response.Result = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Where(p => p.OrderId == tblOrders.OrderId).FirstOrDefault();
                     response.Message = SucessMessege;
                     response.HasError = false;
@@ -225,7 +226,17 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<int>();
             try
             {
+                _context.TblOrderStatus.Add(new TblOrderStatus
+                {
+                    OrderStatusCode = 0,
+                    OrderStatus="Created"
+                    
+                });
+                _context.SaveChanges();
+                var id = _context.TblOrderStatus.Max(x => x.OrderStatusId);
+                tblOrders.OrderStatusId = id;
                 _context.TblOrders.Add(tblOrders);
+
                 _context.SaveChanges();
 
                 response.Message = SucessMessege;
@@ -351,7 +362,18 @@ namespace ByHandDeliveryApi.Controllers
                         await _context.SaveChangesAsync();
 
                         response.HasError = false;
-                        response.Message = "Successfully deleted orderId" + " " + id;
+                        response.Message = "Successfully deleted orderId";
+                        response.Result = id.ToString();
+
+                    }
+                    else
+                    {
+                        _context.TblOrders.Remove(tblOrders);
+                        await _context.SaveChangesAsync();
+
+                        response.HasError = false;
+                        response.Message = "Successfully deleted orderId";
+                        response.Result = id.ToString();
 
                     }
                 }
