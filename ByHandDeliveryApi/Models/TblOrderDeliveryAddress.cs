@@ -21,6 +21,7 @@ namespace ByHandDeliveryApi.Models
         public string PinCode { get; set; }
         public string Time { get; set; }
         public string DropLocality { get; set; }
+        public string ProductImage { get; set; }
 
         public TblOrders Order { get; set; }
     }

@@ -27,6 +27,36 @@ namespace ByHandDeliveryApi.Controllers
             _mapper = mapper;
         }
 
+
+        [HttpGet ("GetAccountDetails")]
+        public IActionResult GetAccountDetails(int deliveryPersonId)
+        {
+            var response = new GenericResponse<List<TblDeliveryPerson>>();
+
+            try
+            {
+                var data = _context.TblDeliveryPerson.Where(p=>p.DeliveryPersonId == deliveryPersonId).Include(p=>p.TblDeliveryPersonAccountDetails).ToList();
+                var list = new List<DeliveryPersonDto>();
+                //foreach (var item in data)
+                //{
+                //    list.Add(_mapper.Map<DeliveryPersonDto>(item));
+                //}
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = data;
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+
+
+            return response.ToHttpResponse();
+        }
+
+
         // GET: api/DeliveryPersons
         [HttpGet]
         public IActionResult GetTblDeliveryPerson()

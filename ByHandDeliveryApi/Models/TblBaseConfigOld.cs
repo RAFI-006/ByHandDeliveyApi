@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ByHandDeliveryApi.Models
 {
-    public partial class TblBaseConfig
+    public partial class TblBaseConfigOld
     {
         public int Id { get; set; }
         public int? BaseRate { get; set; }

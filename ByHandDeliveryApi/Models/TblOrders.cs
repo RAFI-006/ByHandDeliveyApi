@@ -27,9 +27,7 @@ namespace ByHandDeliveryApi.Models
         public string GoodsType { get; set; }
         public int? ParcelValue { get; set; }
         public int? OrderAmount { get; set; }
-        public bool? Cod { get; set; }
-        public bool? FromTheBalance { get; set; }
-        public bool? ByCreditCard { get; set; }
+        public int? PaymentTypeId { get; set; }
         public int? OrderStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Time { get; set; }
@@ -43,7 +41,6 @@ namespace ByHandDeliveryApi.Models
 
         public TblCustomers Customer { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }
-        public TblOrderStatus OrderStatus { get; set; }
         public ICollection<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace ByHandDeliveryApi.DTO
     {
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
-        public int? DeliveryPersonId { get; set; }
+        public int DeliveryPersonId { get; set; }
         public string PickupLocality { get; set; }
         public string MobileNo { get; set; }
         public DateTime? PickupDate { get; set; }
@@ -25,9 +25,7 @@ namespace ByHandDeliveryApi.DTO
         public string GoodsType { get; set; }
         public int? ParcelValue { get; set; }
         public int? OrderAmount { get; set; }
-        public bool? Cod { get; set; }
-        public bool? FromTheBalance { get; set; }
-        public bool? ByCreditCard { get; set; }
+        public int? PaymentTypeId { get; set; }
         public int? OrderStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Time { get; set; }
@@ -38,10 +36,8 @@ namespace ByHandDeliveryApi.DTO
         public string City { get; set; }
         public string PaymentFrom { get; set; }
         public string ProductImage { get; set; }
-
         public CustomersDto Customer { get; set; }
         public DeliveryPersonDto DeliveryPerson { get; set; }
-        public TblOrderStatus OrderStatus { get; set; }
         public ICollection<OrderDeliveryAddDto> TblOrderDeliveryAddress { get; set; }
 
 

@@ -36,7 +36,7 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p=>p.TblOrderDeliveryAddress).Include(p=>p.OrderStatus).ToList();
+                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p=>p.TblOrderDeliveryAddress).ToList();
                 var responseList = new List<OrderDto>();
                 foreach(var item in data)
                 {
@@ -63,7 +63,7 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).Include(p=>p.OrderStatus).ToList().Where(p => p.OrderStatus.OrderStatusCode == 0).ToList();
+                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).ToList().Where(p=>p.OrderStatusId==9).ToList();
 
                 if (model.City == null && model.Distance == null)
                 {
@@ -73,7 +73,7 @@ namespace ByHandDeliveryApi.Controllers
                 }
                 else if (model.City == null) {
 
-                    var result = data.Where(p => Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatus.OrderStatusCode == 0).ToList();
+                    var result = data.Where(p => Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatusId== 9).ToList();
 
 
                     response.Message = SucessMessege;
@@ -83,7 +83,7 @@ namespace ByHandDeliveryApi.Controllers
                 else if (model.Distance == null)
                 {
 
-                    var result = data.Where(p => p.City == model.City && p.OrderStatus.OrderStatusCode == 0).ToList();
+                    var result = data.Where(p => p.City == model.City && p.OrderStatusId== 9).ToList();
 
                     response.Message = SucessMessege;
                     response.HasError = false;
@@ -92,7 +92,7 @@ namespace ByHandDeliveryApi.Controllers
                 else
                 {
 
-                    var result = data.Where(p => p.City == model.City && Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatus.OrderStatusCode == 0).ToList();
+                    var result = data.Where(p => p.City == model.City && Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatusId == 9).ToList();
 
                     response.Message = SucessMessege;
                     response.HasError = false;
@@ -160,9 +160,9 @@ namespace ByHandDeliveryApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (tblOrders.OrderStatus.OrderStatusCode == 1)
+            if (tblOrders.OrderStatusId == 10)
                 _notificationMsg = "Your order has been accepted";
-            else if (tblOrders.OrderStatus.OrderStatusCode == 2)
+            else if (tblOrders.OrderStatusId == 11)
             {
                 _notificationMsg = "Your order has been picked up from the pickup point " +
                     tblOrders.PickupAddress;
@@ -177,7 +177,7 @@ namespace ByHandDeliveryApi.Controllers
                 if (TblOrdersExists(tblOrders.OrderId))
                 {
                     _context.Entry(tblOrders).State = EntityState.Modified;
-                    _context.TblOrderStatus.Update(tblOrders.OrderStatus);
+                  //  _context.TblOrderStatus.Update(tblOrders.OrderStatusId);
                     await _context.SaveChangesAsync();
 
                     response.Result = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Where(p => p.OrderId == tblOrders.OrderId).FirstOrDefault();
@@ -226,15 +226,8 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<int>();
             try
             {
-                _context.TblOrderStatus.Add(new TblOrderStatus
-                {
-                    OrderStatusCode = 0,
-                    OrderStatus="Created"
-                    
-                });
-                _context.SaveChanges();
-                var id = _context.TblOrderStatus.Max(x => x.OrderStatusId);
-                tblOrders.OrderStatusId = id;
+               
+               
                 _context.TblOrders.Add(tblOrders);
 
                 _context.SaveChanges();
@@ -263,7 +256,7 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).Include(p=>p.OrderStatus).ToList();
+                var data = _context.TblOrders.Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).ToList();
 
                 var tblOrders = data.Where(p => p.CustomerId == customerId).ToList();
 
@@ -302,7 +295,7 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.Customer).Include(p=>p.TblOrderDeliveryAddress).Include(p=>p.OrderStatus).ToList();
+                var data = _context.TblOrders.Include(p => p.Customer).Include(p=>p.TblOrderDeliveryAddress).ToList();
 
                 var tblOrders = data.Where(p => p.DeliveryPersonId == id && p.DeliveryPersonId!=null).ToList();
 
