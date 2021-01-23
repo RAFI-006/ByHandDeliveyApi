@@ -42,7 +42,7 @@ namespace ByHandDeliveryApi.DTO
         public CustomersDto Customer { get; set; }
         public DeliveryPersonDto DeliveryPerson { get; set; }
         public TblOrderStatus OrderStatus { get; set; }
-        public ICollection<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
+        public ICollection<OrderDeliveryAddDto> TblOrderDeliveryAddress { get; set; }
 
 
     }
