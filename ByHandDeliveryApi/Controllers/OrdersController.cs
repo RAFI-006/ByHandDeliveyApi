@@ -36,7 +36,12 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<List<OrderDto>>();
             try
             {
-                var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p=>p.TblOrderDeliveryAddress).ToList();
+                var c = new OrderDto();
+                
+               List <TblOrders> data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p=>p.TblOrderDeliveryAddress).ToList();
+                 
+               
+                
                 var responseList = new List<OrderDto>();
                 foreach(var item in data)
                 {
@@ -73,7 +78,7 @@ namespace ByHandDeliveryApi.Controllers
                 }
                 else if (model.City == null) {
 
-                    var result = data.Where(p => Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatusId== 9).ToList();
+                    var result = data.Where(p => Convert.ToInt16(p.Distance) < Convert.ToInt16(model.Distance) && p.OrderStatusId== 9).ToList();
 
 
                     response.Message = SucessMessege;
@@ -92,7 +97,7 @@ namespace ByHandDeliveryApi.Controllers
                 else
                 {
 
-                    var result = data.Where(p => p.City == model.City && Convert.ToInt16(p.Distance.Split('.')[0]) < Convert.ToInt16(model.Distance.Split('.')[0]) && p.OrderStatusId == 9).ToList();
+                    var result = data.Where(p => p.City == model.City && Convert.ToInt16(p.Distance) < Convert.ToInt16(model.Distance) && p.OrderStatusId == 9).ToList();
 
                     response.Message = SucessMessege;
                     response.HasError = false;
@@ -216,32 +221,86 @@ namespace ByHandDeliveryApi.Controllers
 
         // POST: api/Orders
         [HttpPost]
-        public async Task<IActionResult> PostTblOrders([FromBody] TblOrders tblOrders)
+        public async Task<IActionResult> PostTblOrders([FromBody] OrderRequest tblOrders)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
+            TblOrders order = null;
             var response = new GenericResponse<int>();
-            try
-            {
-               
-               
-                _context.TblOrders.Add(tblOrders);
+         
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
 
-                _context.SaveChanges();
+                         order = new TblOrders
+                        {
+                            OrderId = tblOrders.OrderId,
+                            CustomerId = tblOrders.CustomerId,
+                            DeliveryPersonId = tblOrders.DeliveryPersonId,
+                            PickupLocality = tblOrders.PickupLocality,
+                            MobileNo = tblOrders.MobileNo,
+                            PickupDate = DateTime.Now,
+                            PickupToTime =new  TimeSpan(Convert.ToInt16(tblOrders.ToTime.Split(':')[0]), Convert.ToInt16(tblOrders.ToTime.Split(':')[1]),58),
+                            PickupFromTime =  new TimeSpan(Convert.ToInt16(tblOrders.FromTime.Split(':')[0]), Convert.ToInt16(tblOrders.FromTime.Split(':')[1]), 58),
+                            PickupAddress = tblOrders.PickupAddress,
+                            ContactPersonMobile = tblOrders.ContactPersonMobile,
+                            ContactPerson = tblOrders.ContactPerson,
+                            InternalOrderNo = tblOrders.InternalOrderNo,
+                            Action = tblOrders.Action,
+                            Weight = tblOrders.Weight,
+                            GoodsType = tblOrders.GoodsType,
+                            ParcelValue = tblOrders.ParcelValue,
+                            OrderAmount = tblOrders.OrderAmount,
+                            PaymentTypeId = tblOrders.PaymentTypeId,
+                            OrderStatusId = tblOrders.OrderStatusId,
+                            CreatedDate = tblOrders.CreatedDate,
+                            FromLat = tblOrders.FromLat,
+                            FromLong = tblOrders.FromLong,
+                            Distance = tblOrders.Distance,
+                            City = tblOrders.City,
+                            PaymentFrom = tblOrders.PaymentFrom,
+                            ProductImage = tblOrders.ProductImage
 
-                response.Message = SucessMessege;
-                response.HasError = false;
-                var data= CreatedAtAction("GetTblOrders", new { id = tblOrders.OrderId }, tblOrders);
-                response.Result = tblOrders.OrderId; 
-            }
-            catch(Exception e)
-            {
-                response.Message = e.InnerException.ToString();
-                response.HasError = true;
-            }
+
+
+
+                        };
+
+                        _context.Add(order);
+
+                        _context.SaveChanges();
+
+                        OrderDeliveryAddDto orderData = tblOrders.OrderDeliveryAdd;
+                        orderData.OrderId = order.OrderId;
+                        orderData.DeliveryFromTime = new TimeSpan(Convert.ToInt16(orderData.FromTime.Split(':')[0]), Convert.ToInt16(tblOrders.FromTime.Split(':')[1]), 58);
+                        orderData.DeliveryToTime = new TimeSpan(Convert.ToInt16(orderData.ToTime.Split(':')[0]), Convert.ToInt16(orderData.ToTime.Split(':')[1]), 58);
+                    orderData.DeliveryDate = DateTime.Now;
+                _context.Add(_mappper.Map<TblOrderDeliveryAddress>(orderData));
+
+                        _context.SaveChanges();
+                    
+                    response.Result = order.OrderId;
+                    response.Message = "Order Succesfull";
+                    response.HasError = false;
+
+                    transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Message =ex.Message;
+                        response.HasError = true;
+                    }
+                }
+
+                   
+
+               
+
+            
 
             return response.ToHttpResponse();
         }

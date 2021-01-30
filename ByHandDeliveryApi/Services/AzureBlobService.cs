@@ -38,7 +38,7 @@ namespace ByHandDeliveryApi.Services
 
                 imageFullPath = imageName;
 
-                  CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(imageName);
+                    CloudBlockBlob cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(imageName);
                     cloudBlockBlob.Properties.ContentType = imageToUpload.ContentType;
 
                   for (int i=0;i<imageToUpload.Length;i++)

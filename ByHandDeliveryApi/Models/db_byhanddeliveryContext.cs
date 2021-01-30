@@ -15,7 +15,6 @@ namespace ByHandDeliveryApi.Models
         {
         }
 
-        public virtual DbSet<TblBaseConfigOld> TblBaseConfigOld { get; set; }
         public virtual DbSet<TblCustomers> TblCustomers { get; set; }
         public virtual DbSet<TblDdvalues> TblDdvalues { get; set; }
         public virtual DbSet<TblDeliveryCity> TblDeliveryCity { get; set; }
@@ -24,12 +23,13 @@ namespace ByHandDeliveryApi.Models
         public virtual DbSet<TblDropDown> TblDropDown { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
-        public virtual DbSet<TblOrderStatusOld> TblOrderStatusOld { get; set; }
+       
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
+               
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Server=tcp:Bindiadb.securehostdns.com,1533;Initial Catalog=db_byhanddelivery;Persist Security Info=False;User ID=hand;Password=Delivery1234!@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
             }
@@ -39,11 +39,7 @@ namespace ByHandDeliveryApi.Models
         {
             modelBuilder.HasAnnotation("Relational:DefaultSchema", "hand");
 
-            modelBuilder.Entity<TblBaseConfigOld>(entity =>
-            {
-                entity.ToTable("tbl_BaseConfig_Old");
-            });
-
+         
             modelBuilder.Entity<TblCustomers>(entity =>
             {
                 entity.HasKey(e => e.CustomerId);
@@ -124,6 +120,11 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.DropDownId).HasColumnName("DropDownID");
+
+                entity.HasOne(d => d.DropDown)
+                    .WithMany(p => p.TblDdvalues)
+                    .HasForeignKey(d => d.DropDownId)
+                    .HasConstraintName("FK_tbl_DDValues_tbl_DropDown");
             });
 
             modelBuilder.Entity<TblDeliveryCity>(entity =>
@@ -200,6 +201,8 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.DocumentFrontImage)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+                entity.Property(e => e.FCMToken)
+                   .IsUnicode(false);
 
                 entity.Property(e => e.DrivingLicenceBackImage)
                     .HasMaxLength(500)
@@ -344,13 +347,9 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.DeliveryDate).HasColumnType("date");
 
-                entity.Property(e => e.DeliveryFromTime)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.DeliveryFromTime).HasColumnType("time(2)");
 
-                entity.Property(e => e.DeliveryToTime)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.DeliveryToTime).HasColumnType("time(2)");
 
                 entity.Property(e => e.DropLocality).IsUnicode(false);
 
@@ -358,13 +357,9 @@ namespace ByHandDeliveryApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Latitude)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Latitude).HasColumnType("decimal(20, 4)");
 
-                entity.Property(e => e.Longitude)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Longitude).HasColumnType("decimal(20, 4)");
 
                 entity.Property(e => e.MobileNo)
                     .HasMaxLength(50)
@@ -372,16 +367,8 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
 
-                entity.Property(e => e.PinCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.ProductImage)
                     .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Time)
-                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Order)
@@ -421,17 +408,11 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
 
-                entity.Property(e => e.Distance)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Distance).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.FromLat)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.FromLat).HasColumnType("decimal(20, 4)");
 
-                entity.Property(e => e.FromLong)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.FromLong).HasColumnType("decimal(20, 4)");
 
                 entity.Property(e => e.GoodsType)
                     .HasMaxLength(100)
@@ -457,26 +438,18 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.PickupDate).HasColumnType("date");
 
-                entity.Property(e => e.PickupFromTime)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.PickupFromTime).HasColumnType("time(2)");
 
                 entity.Property(e => e.PickupLocality)
                     .HasMaxLength(1000)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PickupToTime)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PinCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.PickupToTime).HasColumnType("time(2)");
 
                 entity.Property(e => e.ProductImage).IsUnicode(false);
 
-                entity.Property(e => e.Time)
-                    .HasMaxLength(100)
+                entity.Property(e => e.PromoCode)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Weight)
@@ -493,19 +466,6 @@ namespace ByHandDeliveryApi.Models
                     .WithMany(p => p.TblOrders)
                     .HasForeignKey(d => d.DeliveryPersonId)
                     .HasConstraintName("FK_tbl_Orders_tbl_DeliveryPerson");
-            });
-
-            modelBuilder.Entity<TblOrderStatusOld>(entity =>
-            {
-                entity.HasKey(e => e.OrderStatusId);
-
-                entity.ToTable("tbl_OrderStatus_Old");
-
-                entity.Property(e => e.OrderStatusId).HasColumnName("OrderStatusID");
-
-                entity.Property(e => e.OrderStatus)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
             });
         }
     }

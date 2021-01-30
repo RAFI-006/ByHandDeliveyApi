@@ -10,12 +10,14 @@ namespace ByHandDeliveryApi.DTO
     {
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
-        public int DeliveryPersonId { get; set; }
+        public int? DeliveryPersonId { get; set; }
         public string PickupLocality { get; set; }
+        public string City { get; set; }
         public string MobileNo { get; set; }
         public DateTime? PickupDate { get; set; }
-        public string PickupFromTime { get; set; }
-        public string PickupToTime { get; set; }
+        public TimeSpan? PickupFromTime { get; set; }
+        public TimeSpan? PickupToTime { get; set; }
+       
         public string PickupAddress { get; set; }
         public string ContactPersonMobile { get; set; }
         public string ContactPerson { get; set; }
@@ -28,14 +30,14 @@ namespace ByHandDeliveryApi.DTO
         public int? PaymentTypeId { get; set; }
         public int? OrderStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public string Time { get; set; }
-        public string FromLat { get; set; }
-        public string FromLong { get; set; }
-        public string Distance { get; set; }
-        public string PinCode { get; set; }
-        public string City { get; set; }
+        public decimal? FromLat { get; set; }
+        public decimal? FromLong { get; set; }
+        public decimal? Distance { get; set; }
         public string PaymentFrom { get; set; }
         public string ProductImage { get; set; }
+        public string PromoCode { get; set; }
+        public int? Discount { get; set; }
+        public int? PointRedemption{get; set;}
         public CustomersDto Customer { get; set; }
         public DeliveryPersonDto DeliveryPerson { get; set; }
         public ICollection<OrderDeliveryAddDto> TblOrderDeliveryAddress { get; set; }

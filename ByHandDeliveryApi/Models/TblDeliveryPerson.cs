@@ -43,9 +43,10 @@ namespace ByHandDeliveryApi.Models
         public string Password { get; set; }
         public string ProfileImage { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int? Points { get; set; }
+        public int? Wallet { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsVerified { get; set; }
+        public string FCMToken { get; set; }
 
         public ICollection<TblDeliveryPersonAccountDetails> TblDeliveryPersonAccountDetails { get; set; }
         public ICollection<TblOrders> TblOrders { get; set; }

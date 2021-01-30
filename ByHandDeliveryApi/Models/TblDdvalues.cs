@@ -11,5 +11,7 @@ namespace ByHandDeliveryApi.Models
         public string Ddvalue { get; set; }
         public int? SortOrderNo { get; set; }
         public bool? IsActive { get; set; }
+
+        public TblDropDown DropDown { get; set; }
     }
 }

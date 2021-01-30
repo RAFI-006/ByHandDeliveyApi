@@ -51,6 +51,25 @@ namespace ByHandDeliveryApi.Controllers
             return Ok(tblOrderDeliveryAddress);
         }
 
+        //[HttpGet("GetMasterWeight")]
+        //public async Task<IActionResult> GetMasterWeight()
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+         
+
+        //    if (tblOrderDeliveryAddress == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(tblOrderDeliveryAddress);
+        //}
+
+
         // PUT: api/OrderDeliveryAddresses/5
         [HttpPut]
         public IActionResult PutTblOrderDeliveryAddress([FromBody] OrderDeliveryAddDto tblOrderDeliveryAddress)
@@ -101,10 +120,11 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            
             GenericResponse<string> responses = new GenericResponse<string>();
             try
             {
+             
                     var mapppedData = _mapper.Map<TblOrderDeliveryAddress>(data);
                     _context.Add(mapppedData);
                     _context.SaveChanges();

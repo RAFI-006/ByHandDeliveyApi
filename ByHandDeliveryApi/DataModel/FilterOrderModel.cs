@@ -7,7 +7,7 @@ namespace ByHandDeliveryApi.DataModel
 {
     public class FilterOrderModel
     {
-        public string Distance { get; set; }
+        public int Distance { get; set; }
         public string City { get; set; }
     }
 }

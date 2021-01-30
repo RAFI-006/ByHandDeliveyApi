@@ -74,11 +74,15 @@ namespace ByHandDeliveryApi.Services.RequestProvider
             var json = JsonConvert.SerializeObject(data);
             var content = new StringContent(json, Encoding.Default, "application/json");
             var servertoken = "key=AAAAeHCrmj8:APA91bG8GQto_hAF7Gv9Ip7AMM7zfjhSjwGARfEjN3tXiU3dU0rOspCdnH8dzkDJnyO9aeaSBXF7WUskJYbIjrVPBR2X_Ixcm1PW9RTbjkj64uGdKyePo3Hk5Rq4AG0k5NIgc7ujpvNv";
+            var deliveryServertoken = "key=AAAAYGu-2RY:APA91bGi3r0amTBleqJB8yk_WCoZEXE6dsnyWuT83G-8uXIZ931MHnjgoIPty3MOt6QuweSTftk4XfCboQ4on50xfojKTUH2ip8t1CmRPxLr47tSlWeDX8S7PMfkqBa1NmGMz5oNlRnS";
+            var basicServerkey = "key=AAAAGE7fqxE:APA91bGwxWW4r71cfkFuFejrEnTCiAxA21cZQM3aZ_Tg-GWEpcAvMcZsPz9uuLi94f6IKX1uKSktaOEiA3sg7eL9H6CzfRLkUsiPxja0yEzIE8D7kXd-f3AgxUBO87-zj9AHvMg4sKVL";
+            var basicHomeLoanKey = "key=AAAA3hLuklI:APA91bGmdL9cjdEdi2_iIDkRARCd5xqpU-FlFT6zfAx5iwxrldSCUYzV72Yh3Rxetep5Sysv7MS1ujJhwicSIdBlEoDAdMsWb8u0ZizFdGqzRXFqHPul53wg5p9Vs6XBEXjZ24HgQqjE";
+
 
             try
             {
                 HttpClient httpClient = CreateHttpClient();
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", servertoken);
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", basicServerkey);
 
                 httpClient.DefaultRequestHeaders.Accept.Clear();
 

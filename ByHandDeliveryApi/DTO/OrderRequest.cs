@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace ByHandDeliveryApi.Models
+namespace ByHandDeliveryApi.DTO
 {
-    public partial class TblOrders
+    public class OrderRequest
     {
-        public TblOrders()
-        {
-            TblOrderDeliveryAddress = new HashSet<TblOrderDeliveryAddress>();
-        }
 
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
@@ -19,6 +17,9 @@ namespace ByHandDeliveryApi.Models
         public DateTime? PickupDate { get; set; }
         public TimeSpan? PickupFromTime { get; set; }
         public TimeSpan? PickupToTime { get; set; }
+        public string FromTime { get; set; }
+        public string ToTime { get; set; }
+
         public string PickupAddress { get; set; }
         public string ContactPersonMobile { get; set; }
         public string ContactPerson { get; set; }
@@ -39,9 +40,6 @@ namespace ByHandDeliveryApi.Models
         public string PromoCode { get; set; }
         public int? Discount { get; set; }
         public int? PointRedemption { get; set; }
-
-        public TblCustomers Customer { get; set; }
-        public TblDeliveryPerson DeliveryPerson { get; set; }
-        public ICollection<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
+        public OrderDeliveryAddDto OrderDeliveryAdd { get; set; }
     }
 }

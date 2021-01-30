@@ -9,6 +9,7 @@ using ByHandDeliveryApi.Models;
 using AutoMapper;
 using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.GenericResponses;
+using System.Data.SqlClient;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -35,7 +36,17 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
+               // var parameter = new SqlParameter("@DropDownKey", "weight");
                 var data = _context.TblDeliveryPerson.Where(p=>p.DeliveryPersonId == deliveryPersonId).Include(p=>p.TblDeliveryPersonAccountDetails).ToList();
+                // var result = _context.Database.ExecuteSqlCommand("prDDValue", parameter);
+
+                 //var check = _context.TblDropDown.Include(p => p.TblDdvalues).Where(p=>p.Ddname ==  "Weight").ToList();
+
+
+                
+                //   var productCategory = "Electronics";
+
+
                 var list = new List<DeliveryPersonDto>();
                 //foreach (var item in data)
                 //{

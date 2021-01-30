@@ -53,7 +53,7 @@ namespace ByHandDeliveryApi
             {
                 c.SwaggerDoc("v1", info: new Microsoft.OpenApi.Models.OpenApiInfo { Title = "ByHandDelivery", Version = "v1" });
             });
-            services.AddDbContext<db_byhanddeliveryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineDeliveryConnectionString")));
+            services.AddDbContext<db_byhanddeliveryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MyConnection")));
 
        
         }
