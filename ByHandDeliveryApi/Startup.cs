@@ -53,7 +53,7 @@ namespace ByHandDeliveryApi
             {
                 c.SwaggerDoc("v1", info: new Microsoft.OpenApi.Models.OpenApiInfo { Title = "ByHandDelivery", Version = "v1" });
             });
-            services.AddDbContext<db_byhanddeliveryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MyConnection")));
+            services.AddDbContext<db_byhanddeliveryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineDeliveryConnectionString")));
 
        
         }
@@ -62,7 +62,10 @@ namespace ByHandDeliveryApi
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseCors(options => options.AllowAnyOrigin());
+            app.UseCors(options => options.AllowAnyMethod());
+            app.UseCors(options => options.AllowAnyHeader());
 
+            
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>

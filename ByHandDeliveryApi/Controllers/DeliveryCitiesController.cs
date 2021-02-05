@@ -16,6 +16,8 @@ using ByHandDeliveryApi.Services.GooglePlaces;
 using ByHandDeliveryApi.DataModel.GooglePlaces;
 using ByHandDeliveryApi.DataModel.GooglePlaces.ByHandDeliveryApi.DataModel.GooglePlaces;
 using ByHandDeliveryApi.DataModel;
+using ByHandDeliveryApi.DTO;
+using AutoMapper;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -27,11 +29,13 @@ namespace ByHandDeliveryApi.Controllers
         private readonly db_byhanddeliveryContext _context;
         private readonly string _successMsg = "Successfully Completed";
         private GooglePlacesService _googleService;
-        public DeliveryCitiesController(db_byhanddeliveryContext context, IConfiguration configuration)
+        private IMapper _mapper;
+        public DeliveryCitiesController(db_byhanddeliveryContext context, IConfiguration configuration,IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
             _googleService = new GooglePlacesService();
+            _mapper = mapper;
         }
 
         // GET: api/DeliveryCities
@@ -152,6 +156,93 @@ namespace ByHandDeliveryApi.Controllers
             return response.ToHttpResponse();
 
         }
+
+        [HttpGet("GetConfigKeys")]
+        public async Task<IActionResult> GetConfigKeys()
+        {
+
+            var response = new GenericResponse<List<string>>();
+
+            var result = new List<string>();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+
+                var data = _context.TblDropDown.ToList();
+
+                foreach (var item in data)
+                    result.Add(item.Ddname);
+
+                if (data != null)
+                {
+                    response.HasError = false;
+                    response.Message = "Sucesss";
+                    response.Result = result;
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.Message = "Failed";
+                    response.Result = null;
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.Message;
+
+
+            }
+
+            return response.ToHttpResponse();
+
+        }
+
+        [HttpGet("GetConfig")]
+        public async Task<IActionResult> GetConfig(string ConfigKey)
+        {
+          
+            var response = new GenericResponse<List<DDValueDTO>>();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+
+                var data = _context.TblDropDown.Include(p => p.TblDdvalues).Where(t=>t.DropDownKey == ConfigKey).FirstOrDefault();
+            
+                if (data!=null)
+                {
+                    response.HasError = false;
+                    response.Message = "Sucesss";
+                    response.Result = _mapper.Map<List<DDValueDTO>>(data.TblDdvalues);
+                }
+                else
+                {
+                    response.HasError = true;
+                    response.Message = "Failed";
+                    response.Result = null;
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.Message;
+
+
+            }
+
+            return response.ToHttpResponse();
+
+        }
+
+
 
         [HttpPost("PostOtp")]
         public async Task<IActionResult> PostOtp(string number)

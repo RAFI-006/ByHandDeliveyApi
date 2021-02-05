@@ -19,9 +19,13 @@ namespace ByHandDeliveryApi.DTO
             CreateMap<DeliveryPersonDto, TblDeliveryPerson>()
                   .ForMember(c => c.TblOrders, opt => opt.Ignore());
 
-            CreateMap<TblOrderDeliveryAddress, OrderDeliveryAddDto>().ForMember(c => c.FromTime, opt => opt.Ignore()).ForMember(c => c.ToTime, opt => opt.Ignore());
+            CreateMap<TblOrderDeliveryAddress, OrderDeliveryAddDto>();
             CreateMap<OrderDeliveryAddDto, TblOrderDeliveryAddress>()
                   .ForMember(c => c.Order, opt => opt.Ignore());
+
+            CreateMap<DDValueDTO, TblDdvalues>().ForMember(c => c.DropDown, opt => opt.Ignore());
+            CreateMap<TblDdvalues, DDValueDTO>();
+
 
             CreateMap<TblOrders, OrderDto>();
             CreateMap<OrderDto, TblOrders>();

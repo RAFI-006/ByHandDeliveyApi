@@ -14,12 +14,8 @@ namespace ByHandDeliveryApi.DTO
         public string PickupLocality { get; set; }
         public string City { get; set; }
         public string MobileNo { get; set; }
-        public DateTime? PickupDate { get; set; }
-        public TimeSpan? PickupFromTime { get; set; }
-        public TimeSpan? PickupToTime { get; set; }
-        public string FromTime { get; set; }
-        public string ToTime { get; set; }
-
+        public DateTime? PickupFromTime { get; set; }
+        public DateTime? PickupToTime { get; set; }
         public string PickupAddress { get; set; }
         public string ContactPersonMobile { get; set; }
         public string ContactPerson { get; set; }

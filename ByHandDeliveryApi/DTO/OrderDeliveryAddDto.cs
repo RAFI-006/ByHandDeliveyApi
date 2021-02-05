@@ -11,13 +11,8 @@ namespace ByHandDeliveryApi.DTO
         public int OrderId { get; set; }
         public string DropLocality { get; set; }
         public string MobileNo { get; set; }
-        public DateTime? DeliveryDate { get; set; }
-        public TimeSpan? DeliveryFromTime { get; set; }
-        public TimeSpan? DeliveryToTime { get; set; }
-        public string FromTime { get; set; }
-        public string ToTime { get; set; }
-
-        public string Time { get; set; }
+        public DateTime? DeliveryFromTime { get; set; }
+        public DateTime? DeliveryToTime { get; set; }
         public string DeliveryAddress { get; set; }
         public string ContactPerson { get; set; }
         public string InternalOrderNo { get; set; }

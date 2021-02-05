@@ -70,7 +70,11 @@ namespace ByHandDeliveryApi.Controllers
             {
                 var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).ToList().Where(p=>p.OrderStatusId==9).ToList();
 
-                if (model.City == null && model.Distance == null)
+
+                
+
+
+                if (model.City == null && model.Distance ==0)
                 {
                     response.Message = SucessMessege;
                     response.HasError = false;
@@ -85,7 +89,7 @@ namespace ByHandDeliveryApi.Controllers
                     response.HasError = false;
                     response.Result = _mappper.Map<List<OrderDto>>(result);
                 }
-                else if (model.Distance == null)
+                else if (model.Distance == 0)
                 {
 
                     var result = data.Where(p => p.City == model.City && p.OrderStatusId== 9).ToList();
@@ -234,17 +238,18 @@ namespace ByHandDeliveryApi.Controllers
                 {
                     try
                     {
+                    ;
+                     
 
                          order = new TblOrders
                         {
                             OrderId = tblOrders.OrderId,
                             CustomerId = tblOrders.CustomerId,
+                            PickupFromTime = tblOrders.PickupFromTime,
+                            PickupToTime =tblOrders.PickupToTime,
                             DeliveryPersonId = tblOrders.DeliveryPersonId,
                             PickupLocality = tblOrders.PickupLocality,
                             MobileNo = tblOrders.MobileNo,
-                            PickupDate = DateTime.Now,
-                            PickupToTime =new  TimeSpan(Convert.ToInt16(tblOrders.ToTime.Split(':')[0]), Convert.ToInt16(tblOrders.ToTime.Split(':')[1]),58),
-                            PickupFromTime =  new TimeSpan(Convert.ToInt16(tblOrders.FromTime.Split(':')[0]), Convert.ToInt16(tblOrders.FromTime.Split(':')[1]), 58),
                             PickupAddress = tblOrders.PickupAddress,
                             ContactPersonMobile = tblOrders.ContactPersonMobile,
                             ContactPerson = tblOrders.ContactPerson,
@@ -275,10 +280,8 @@ namespace ByHandDeliveryApi.Controllers
 
                         OrderDeliveryAddDto orderData = tblOrders.OrderDeliveryAdd;
                         orderData.OrderId = order.OrderId;
-                        orderData.DeliveryFromTime = new TimeSpan(Convert.ToInt16(orderData.FromTime.Split(':')[0]), Convert.ToInt16(tblOrders.FromTime.Split(':')[1]), 58);
-                        orderData.DeliveryToTime = new TimeSpan(Convert.ToInt16(orderData.ToTime.Split(':')[0]), Convert.ToInt16(orderData.ToTime.Split(':')[1]), 58);
-                    orderData.DeliveryDate = DateTime.Now;
-                _context.Add(_mappper.Map<TblOrderDeliveryAddress>(orderData));
+
+                    _context.Add(_mappper.Map<TblOrderDeliveryAddress>(orderData));
 
                         _context.SaveChanges();
                     

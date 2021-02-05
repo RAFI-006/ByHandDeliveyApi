@@ -14,10 +14,8 @@ namespace ByHandDeliveryApi.DTO
         public string PickupLocality { get; set; }
         public string City { get; set; }
         public string MobileNo { get; set; }
-        public DateTime? PickupDate { get; set; }
-        public TimeSpan? PickupFromTime { get; set; }
-        public TimeSpan? PickupToTime { get; set; }
-       
+        public DateTime? PickupFromTime { get; set; }
+        public DateTime? PickupToTime { get; set; }
         public string PickupAddress { get; set; }
         public string ContactPersonMobile { get; set; }
         public string ContactPerson { get; set; }
@@ -37,7 +35,7 @@ namespace ByHandDeliveryApi.DTO
         public string ProductImage { get; set; }
         public string PromoCode { get; set; }
         public int? Discount { get; set; }
-        public int? PointRedemption{get; set;}
+        public int? PointRedemption { get; set; }
         public CustomersDto Customer { get; set; }
         public DeliveryPersonDto DeliveryPerson { get; set; }
         public ICollection<OrderDeliveryAddDto> TblOrderDeliveryAddress { get; set; }

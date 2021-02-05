@@ -43,7 +43,7 @@ namespace ByHandDeliveryApi.DTO
         public int? Wallet { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsVerified { get; set; }
-        public string FCMToken { get; set; }
+        public string Fcmtoken { get; set; }
 
 
 
