@@ -18,6 +18,8 @@ using ByHandDeliveryApi.DataModel.GooglePlaces.ByHandDeliveryApi.DataModel.Googl
 using ByHandDeliveryApi.DataModel;
 using ByHandDeliveryApi.DTO;
 using AutoMapper;
+using System.IO;
+using Microsoft.Extensions.Options;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -25,17 +27,29 @@ namespace ByHandDeliveryApi.Controllers
     [ApiController]
     public class DeliveryCitiesController : ControllerBase
     {
+     
+        private readonly DocumentImagePathSetting DocumentImagePath;
+        private readonly ProfileImagePathSetting ProfileImagePath;
+        private readonly ProductImagePathSetting ProductImagePath;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly IConfiguration _configuration;
         private readonly db_byhanddeliveryContext _context;
         private readonly string _successMsg = "Successfully Completed";
         private GooglePlacesService _googleService;
         private IMapper _mapper;
-        public DeliveryCitiesController(db_byhanddeliveryContext context, IConfiguration configuration,IMapper mapper)
+        public DeliveryCitiesController(db_byhanddeliveryContext context, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor, IOptions<ProfileImagePathSetting> OptionProfileSetting, IOptions<DocumentImagePathSetting> OptionDocumentSetting, IOptions<ProductImagePathSetting> OptionProductSetting)
         {
             _context = context;
             _configuration = configuration;
             _googleService = new GooglePlacesService();
             _mapper = mapper;
+
+            _httpContextAccessor = httpContextAccessor;
+            ProfileImagePath = OptionProfileSetting.Value;
+            DocumentImagePath = OptionDocumentSetting.Value;
+            ProductImagePath = OptionProductSetting.Value;
+
         }
 
         // GET: api/DeliveryCities
@@ -119,40 +133,49 @@ namespace ByHandDeliveryApi.Controllers
         }
 
         [HttpPost("PostImagetoBlobStorage")]
-        public async Task<IActionResult> PostImagetoBlobStorage(List<IFormFile> File)
+        public async Task<IActionResult> PostImagetoBlobStorage(List<IFormFile> File, string ImageType)
         {
-            AzureBlobService service = new AzureBlobService();
+            string ImagePath = "";
             GenericResponse<string> response = new GenericResponse<string>();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            switch (ImageType.ToLower())
+            {
+                case "profile":
+                    ImagePath = ProfileImagePath.ProfilesImagePath;
+                    break;
+                case "product":
+                    ImagePath = ProductImagePath.ProductsImagePath;
+                    break;
+                case "document":
+                    ImagePath = DocumentImagePath.DocumentsImagePath;
+                    break;
+            }
+
             try
             {
-                string path = await service.UploadImageAsync(File[0]);
+                string imagefileName = Guid.NewGuid().ToString() + Path.GetExtension(File[0].FileName);
 
-                if (!string.IsNullOrEmpty(path))
+                string FilePath = string.Concat(ImagePath, "/", imagefileName);
+
+                using (var stream = System.IO.File.Create(FilePath))
                 {
+                    await File[0].CopyToAsync(stream);
+                    stream.Close();
                     response.HasError = false;
                     response.Message = "Sucesss";
-                    response.Result = path;
-                }
-                else
-                {
-                    response.HasError = true;
-                    response.Message = "Failed";
-                    response.Result = path;
+                    string host = _httpContextAccessor.HttpContext.Request.Host.Value;
+                    response.Result = string.Concat("https://", host, "/", FilePath);
                 }
             }
             catch (Exception e)
             {
                 response.HasError = true;
                 response.Message = e.Message;
-
-
             }
-
             return response.ToHttpResponse();
 
         }

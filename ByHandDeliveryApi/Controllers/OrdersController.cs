@@ -176,7 +176,7 @@ namespace ByHandDeliveryApi.Controllers
                 _notificationMsg = "Your order has been picked up from the pickup point " +
                     tblOrders.PickupAddress;
             }
-            else
+            else if(tblOrders.OrderStatusId == 12)
 
                 _notificationMsg = "Your order is sucessfully delivered to the delivered address";
             var response = new GenericResponse<TblOrders>();

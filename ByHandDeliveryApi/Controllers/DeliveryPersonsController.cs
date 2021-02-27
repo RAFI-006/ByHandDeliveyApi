@@ -10,6 +10,7 @@ using AutoMapper;
 using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.GenericResponses;
 using System.Data.SqlClient;
+using ByHandDeliveryApi.Services;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -153,7 +154,7 @@ namespace ByHandDeliveryApi.Controllers
 
         // PUT: api/DeliveryPersons/5
         [HttpPut]
-        public  IActionResult PutTblDeliveryPerson([FromBody] DeliveryPersonDto tblDeliveryPerson)
+        public async  Task<IActionResult> PutTblDeliveryPerson([FromBody] DeliveryPersonDto tblDeliveryPerson)
         {
             if (!ModelState.IsValid)
             {
@@ -165,10 +166,20 @@ namespace ByHandDeliveryApi.Controllers
             {
                 if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonId))
                 {
-                    _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
+                    bool? isBoyVerified = tblDeliveryPerson.IsVerified;
+                    if (tblDeliveryPerson.IsVerified == false)
+                        tblDeliveryPerson.IsVerified = true;
+                        _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
                     _context.SaveChanges();
                     var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == tblDeliveryPerson.MobileNo).FirstOrDefault();
                     response.Result = _mapper.Map<DeliveryPersonDto>(res);
+
+
+
+                    if(isBoyVerified == false)
+                    await FireBaseService.PostDeliveryBoyNotifications(res.Fcmtoken,"Verification Msg","Your Profie is sucessfully reviewed");
+                 
+
                     response.Message = "Successfull";
                     response.HasError = false;
                 }
