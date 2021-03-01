@@ -25,12 +25,15 @@ using System.IO;
 namespace ByHandDeliveryApi
 {
     public class Startup
+
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -38,9 +41,13 @@ namespace ByHandDeliveryApi
         {
             //  services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddCors(c =>
+            services.AddCors(options =>
             {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+                options.AddPolicy( MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin();
+                    });
             });
             services.AddMvc(options => {
 
@@ -72,7 +79,7 @@ namespace ByHandDeliveryApi
 
             //HttpConfiguration config = new HttpConfiguration();
             //config.EnableCors();
-
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -80,13 +87,14 @@ namespace ByHandDeliveryApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ByHandDelivery V1");
                 c.RoutePrefix = string.Empty;
             });
-            // For browsing Image file from the browser
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                Path.Combine(Directory.GetCurrentDirectory(), "images")),
-                RequestPath = "/images"
-            });
+         //   For browsing Image file from the browser
+
+           app.UseStaticFiles(new StaticFileOptions
+           {
+               FileProvider = new PhysicalFileProvider(
+               Path.Combine(Directory.GetCurrentDirectory(), "images")),
+               RequestPath = "/images"
+           });
             app.UseMvc();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
