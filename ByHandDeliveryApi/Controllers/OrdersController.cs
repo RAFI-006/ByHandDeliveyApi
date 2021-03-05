@@ -11,11 +11,13 @@ using ByHandDeliveryApi.GenericResponses;
 using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.DataModel;
 using ByHandDeliveryApi.Services;
+using System.Web.Http.Cors;
 
 namespace ByHandDeliveryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyAllowSpecificOrigins", headers: "*", methods: "*")]
     public class OrdersController : ControllerBase
     {
         private readonly db_byhanddeliveryContext _context;
@@ -308,6 +310,92 @@ namespace ByHandDeliveryApi.Controllers
             return response.ToHttpResponse();
         }
 
+
+
+
+        [HttpPut("editOrders")]
+        public async Task<IActionResult> EditTblOrders([FromBody] OrderRequest tblOrders)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            TblOrders order = null;
+            var response = new GenericResponse<int>();
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    
+
+
+                    order = new TblOrders
+                    {
+                        OrderId = tblOrders.OrderId,
+                        CustomerId = tblOrders.CustomerId,
+                        PickupFromTime = tblOrders.PickupFromTime,
+                        PickupToTime = tblOrders.PickupToTime,
+                        DeliveryPersonId = tblOrders.DeliveryPersonId,
+                        PickupLocality = tblOrders.PickupLocality,
+                        MobileNo = tblOrders.MobileNo,
+                        PickupAddress = tblOrders.PickupAddress,
+                        ContactPersonMobile = tblOrders.ContactPersonMobile,
+                        ContactPerson = tblOrders.ContactPerson,
+                        InternalOrderNo = tblOrders.InternalOrderNo,
+                        Action = tblOrders.Action,
+                        Weight = tblOrders.Weight,
+                        GoodsType = tblOrders.GoodsType,
+                        ParcelValue = tblOrders.ParcelValue,
+                        OrderAmount = tblOrders.OrderAmount,
+                        PaymentTypeId = tblOrders.PaymentTypeId,
+                        OrderStatusId = tblOrders.OrderStatusId,
+                        CreatedDate = tblOrders.CreatedDate,
+                        FromLat = tblOrders.FromLat,
+                        FromLong = tblOrders.FromLong,
+                        Distance = tblOrders.Distance,
+                        City = tblOrders.City,
+                        PaymentFrom = tblOrders.PaymentFrom,
+                        ProductImage = tblOrders.ProductImage
+
+
+
+
+                    };
+
+                    _context.Update(order);
+
+                    _context.SaveChanges();
+
+                    OrderDeliveryAddDto orderData = tblOrders.OrderDeliveryAdd;
+                    orderData.OrderId = order.OrderId;
+                    
+                    _context.Update(_mappper.Map<TblOrderDeliveryAddress>(orderData));
+
+                    _context.SaveChanges();
+
+                    response.Result = order.OrderId;
+                    response.Message = "Order Succesfull";
+                    response.HasError = false;
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    response.Message = ex.Message;
+                    response.HasError = true;
+                }
+            }
+
+
+
+
+
+
+
+            return response.ToHttpResponse();
+        }
         [HttpGet("customerOrder")]
         public IActionResult GetCustomerOrder(int customerId)
         {

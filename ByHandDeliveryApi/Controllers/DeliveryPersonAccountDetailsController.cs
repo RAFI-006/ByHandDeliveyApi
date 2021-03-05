@@ -9,11 +9,13 @@ using ByHandDeliveryApi.Models;
 using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.GenericResponses;
 using AutoMapper;
+using System.Web.Http.Cors;
 
 namespace ByHandDeliveryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyAllowSpecificOrigins", headers: "*", methods: "*")]
     public class DeliveryPersonAccountDetailsController : ControllerBase
     {
         private readonly db_byhanddeliveryContext _context;

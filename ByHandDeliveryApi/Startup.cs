@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using System.Web.Http;
 
 namespace ByHandDeliveryApi
 {
@@ -33,7 +34,7 @@ namespace ByHandDeliveryApi
         }
 
 
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+       // readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -43,11 +44,13 @@ namespace ByHandDeliveryApi
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddCors(options =>
             {
-                options.AddPolicy( MyAllowSpecificOrigins,
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin();
-                    });
+                options.AddPolicy( "MyAllowSpecificOrigins",
+                   builder =>
+                   {
+
+                       builder.WithOrigins("http://byhanddelivery.com",
+                                           "http://www.byhanddelivery.com").AllowAnyHeader().AllowAnyMethod();
+                   });
             });
             services.AddMvc(options => {
 
@@ -79,7 +82,9 @@ namespace ByHandDeliveryApi
 
             //HttpConfiguration config = new HttpConfiguration();
             //config.EnableCors();
-            app.UseCors(MyAllowSpecificOrigins);
+        
+
+            app.UseCors("MyAllowSpecificOrigins");
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -89,15 +94,16 @@ namespace ByHandDeliveryApi
             });
          //   For browsing Image file from the browser
 
-           app.UseStaticFiles(new StaticFileOptions
-           {
-               FileProvider = new PhysicalFileProvider(
-               Path.Combine(Directory.GetCurrentDirectory(), "images")),
-               RequestPath = "/images"
-           });
+           //app.UseStaticFiles(new StaticFileOptions
+           //{
+           //    FileProvider = new PhysicalFileProvider(
+           //    Path.Combine(Directory.GetCurrentDirectory(), "images")),
+           //    RequestPath = "/images"
+           //});
             app.UseMvc();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
         }
+       
     }
 }

@@ -11,11 +11,13 @@ using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.GenericResponses;
 using System.Data.SqlClient;
 using ByHandDeliveryApi.Services;
+using System.Web.Http.Cors;
 
 namespace ByHandDeliveryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyAllowSpecificOrigins", headers: "*", methods: "*")]
     public class DeliveryPersonsController : ControllerBase
     {
         private readonly db_byhanddeliveryContext _context;

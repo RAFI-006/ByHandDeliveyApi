@@ -20,11 +20,13 @@ using ByHandDeliveryApi.DTO;
 using AutoMapper;
 using System.IO;
 using Microsoft.Extensions.Options;
+using System.Web.Http.Cors;
 
 namespace ByHandDeliveryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyAllowSpecificOrigins", headers: "*", methods: "*")]
     public class DeliveryCitiesController : ControllerBase
     {
      
@@ -168,7 +170,7 @@ namespace ByHandDeliveryApi.Controllers
                     response.HasError = false;
                     response.Message = "Sucesss";
                     string host = _httpContextAccessor.HttpContext.Request.Host.Value;
-                    response.Result = string.Concat("https://", host, "/", FilePath);
+                    response.Result = string.Concat("http://", host, "/", FilePath);
                 }
             }
             catch (Exception e)
