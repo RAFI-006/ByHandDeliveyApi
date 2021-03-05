@@ -38,6 +38,8 @@ namespace ByHandDeliveryApi.Models
         public string PromoCode { get; set; }
         public int? Discount { get; set; }
         public int? PointRedemption { get; set; }
+        public int? PaymentStatusID { get; set; }
+       
 
         public TblCustomers Customer { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }

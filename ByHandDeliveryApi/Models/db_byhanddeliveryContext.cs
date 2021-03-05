@@ -136,7 +136,9 @@ namespace ByHandDeliveryApi.Models
                 entity.HasKey(e => e.DeliveryCityId);
 
                 entity.ToTable("tbl_DeliveryCity");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(20, 6)");
 
+                entity.Property(e => e.Longitude).HasColumnType("decimal(20, 6)");
                 entity.Property(e => e.DeliveryCityId).HasColumnName("DeliveryCityID");
 
                 entity.Property(e => e.DeliveryCity)
@@ -435,6 +437,7 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.PaymentFrom).IsUnicode(false);
 
                 entity.Property(e => e.PaymentTypeId).HasColumnName("PaymentTypeID");
+                entity.Property(e => e.PaymentTypeId).HasColumnName("PaymentStatusID");
 
                 entity.Property(e => e.PickupAddress)
                     .HasMaxLength(8000)

@@ -288,7 +288,7 @@ namespace ByHandDeliveryApi.Controllers
                         _context.SaveChanges();
                     
                     response.Result = order.OrderId;
-                    response.Message = "Order Succesfull";
+                    response.Message = "Order Succesfull Updated";
                     response.HasError = false;
 
                     transaction.Commit();

@@ -8,5 +8,7 @@ namespace ByHandDeliveryApi.Models
         public int DeliveryCityId { get; set; }
         public string DeliveryCity { get; set; }
         public bool? IsActive { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
     }
 }

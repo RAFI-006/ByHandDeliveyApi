@@ -26,6 +26,7 @@ namespace ByHandDeliveryApi.DTO
         public int? ParcelValue { get; set; }
         public int? OrderAmount { get; set; }
         public int? PaymentTypeId { get; set; }
+        public int? PaymentStatusID { get; set; }
         public int? OrderStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public decimal? FromLat { get; set; }
