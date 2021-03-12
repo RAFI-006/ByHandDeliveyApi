@@ -437,7 +437,7 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.PaymentFrom).IsUnicode(false);
 
                 entity.Property(e => e.PaymentTypeId).HasColumnName("PaymentTypeID");
-                entity.Property(e => e.PaymentTypeId).HasColumnName("PaymentStatusID");
+                entity.Property(e => e.PaymentStatusID).HasColumnName("PaymentStatusID");
 
                 entity.Property(e => e.PickupAddress)
                     .HasMaxLength(8000)

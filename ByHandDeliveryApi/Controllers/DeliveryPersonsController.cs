@@ -168,9 +168,7 @@ namespace ByHandDeliveryApi.Controllers
             {
                 if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonId))
                 {
-                    bool? isBoyVerified = tblDeliveryPerson.IsVerified;
-                    if (tblDeliveryPerson.IsVerified == false)
-                        tblDeliveryPerson.IsVerified = true;
+                
                         _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
                     _context.SaveChanges();
                     var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == tblDeliveryPerson.MobileNo).FirstOrDefault();
@@ -178,9 +176,7 @@ namespace ByHandDeliveryApi.Controllers
 
 
 
-                    if(isBoyVerified == false)
-                    await FireBaseService.PostDeliveryBoyNotifications(res.Fcmtoken,"Verification Msg","Your Profie is sucessfully reviewed");
-                 
+               
 
                     response.Message = "Successfull";
                     response.HasError = false;
@@ -202,6 +198,64 @@ namespace ByHandDeliveryApi.Controllers
 
             return response.ToHttpResponse();
         }
+
+
+        [HttpPut("VerifyDeliveryBoy")]
+        public async Task<IActionResult> VerifyDeliveryPerosn(int deliveryBoyId , bool isVerified)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            GenericResponse<string> response = new GenericResponse<string>();
+            try
+            {
+                if (TblDeliveryPersonExists(deliveryBoyId))
+                {
+                    var user = _context.TblDeliveryPerson.Where((p) => p.DeliveryPersonId == deliveryBoyId).FirstOrDefault();
+                    user.IsVerified = isVerified;
+                    _context.Update(_mapper.Map<TblDeliveryPerson>(user));
+                    _context.SaveChanges();
+                    var res = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryBoyId).FirstOrDefault();
+
+
+
+
+                    if (res.IsVerified == true)
+                    {
+                        response.Result = "Your a verified user";
+                        await FireBaseService.PostDeliveryBoyNotifications(res.Fcmtoken, "Verification Msg", "Your Profie is sucessfully reviewed");
+                    }
+                    else
+                    {
+                        response.Result = "Your Verification is on hold";
+                        await FireBaseService.PostDeliveryBoyNotifications(res.Fcmtoken, "Verification Msg", "Your Verification is on hold , Pls contact the Support Team");
+
+
+                    }
+
+                    response.Message = "Successfull";
+                    response.HasError = false;
+                }
+                else
+                {
+                    response.Message = "User not found";
+                    response.HasError = true;
+
+                }
+
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = true;
+
+            }
+
+            return response.ToHttpResponse();
+        }
+
 
         // POST: api/DeliveryPersons
         [HttpPost]
