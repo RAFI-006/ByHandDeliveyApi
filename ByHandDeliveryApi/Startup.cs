@@ -92,14 +92,15 @@ namespace ByHandDeliveryApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ByHandDelivery V1");
                 c.RoutePrefix = string.Empty;
             });
-         //   For browsing Image file from the browser
+           // For browsing Image file from the browser
 
-           //app.UseStaticFiles(new StaticFileOptions
-           //{
-           //    FileProvider = new PhysicalFileProvider(
-           //    Path.Combine(Directory.GetCurrentDirectory(), "images")),
-           //    RequestPath = "/images"
-           //});
+
+         app.UseStaticFiles(new StaticFileOptions
+         {
+             FileProvider = new PhysicalFileProvider(
+             Path.Combine(Directory.GetCurrentDirectory(), "images")),
+             RequestPath = "/images"
+         });
             app.UseMvc();
             app.UseStaticFiles();
             app.UseHttpsRedirection();

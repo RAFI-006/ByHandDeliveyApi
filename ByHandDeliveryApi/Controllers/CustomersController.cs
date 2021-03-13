@@ -109,6 +109,47 @@ namespace ByHandDeliveryApi.Controllers
         }
 
 
+        [HttpPut("ResetPassword")]
+        public IActionResult ResetPassword(string phone,String password)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = new GenericResponse<String>();
+            try
+            {
+                var tblCustomers = _context.TblCustomers.Where(p => p.MobileNo == phone).FirstOrDefault();
+
+          
+
+                if (tblCustomers == null)
+                {
+                    response.HasError = true;
+                    response.Message = "This number is not registered";
+                }
+                else
+                {
+                    tblCustomers.Password = password;
+                    _context.TblCustomers.Update(tblCustomers);
+                    _context.SaveChanges();
+                    response.HasError = false;
+                    response.Message = _successMsg;
+                    response.Result = "Password Successfully Updated";
+
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.Message;
+
+            }
+
+            return response.ToHttpResponse();
+
+        }
+
         [HttpGet("IsCustomerRegistered")]
         public IActionResult IsUserRegisered(string number)
         {

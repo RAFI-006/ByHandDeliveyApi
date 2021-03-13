@@ -25,28 +25,28 @@ namespace ByHandDeliveryApi.Controllers
         private readonly string _successMsg = "Successfully Completed";
 
 
-        public DeliveryPersonsController(db_byhanddeliveryContext context,IMapper mapper)
+        public DeliveryPersonsController(db_byhanddeliveryContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
 
-        [HttpGet ("GetAccountDetails")]
+        [HttpGet("GetAccountDetails")]
         public IActionResult GetAccountDetails(int deliveryPersonId)
         {
             var response = new GenericResponse<List<TblDeliveryPerson>>();
 
             try
             {
-               // var parameter = new SqlParameter("@DropDownKey", "weight");
-                var data = _context.TblDeliveryPerson.Where(p=>p.DeliveryPersonId == deliveryPersonId).Include(p=>p.TblDeliveryPersonAccountDetails).ToList();
+                // var parameter = new SqlParameter("@DropDownKey", "weight");
+                var data = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryPersonId).Include(p => p.TblDeliveryPersonAccountDetails).ToList();
                 // var result = _context.Database.ExecuteSqlCommand("prDDValue", parameter);
 
-                 //var check = _context.TblDropDown.Include(p => p.TblDdvalues).Where(p=>p.Ddname ==  "Weight").ToList();
+                //var check = _context.TblDropDown.Include(p => p.TblDdvalues).Where(p=>p.Ddname ==  "Weight").ToList();
 
 
-                
+
                 //   var productCategory = "Electronics";
 
 
@@ -99,6 +99,48 @@ namespace ByHandDeliveryApi.Controllers
 
             return response.ToHttpResponse();
         }
+
+        [HttpPut("ResetPassword")]
+        public IActionResult ResetPassword(string phone, String password)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = new GenericResponse<String>();
+            try
+            {
+                var tblCustomers = _context.TblDeliveryPerson.Where(p => p.MobileNo == phone).FirstOrDefault();
+
+
+
+                if (tblCustomers == null)
+                {
+                    response.HasError = true;
+                    response.Message = "This number is not registered";
+                }
+                else
+                {
+                    tblCustomers.Password = password;
+                    _context.TblDeliveryPerson.Update(tblCustomers);
+                    _context.SaveChanges();
+                    response.HasError = false;
+                    response.Message = _successMsg;
+                    response.Result = "Password Successfully Updated";
+
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.Message;
+
+            }
+
+            return response.ToHttpResponse();
+
+        }
+    
 
         [HttpGet("Login")]
         public IActionResult Login(string phone, string pass)
