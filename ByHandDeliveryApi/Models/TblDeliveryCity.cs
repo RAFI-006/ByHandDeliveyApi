@@ -10,5 +10,7 @@ namespace ByHandDeliveryApi.Models
         public bool? IsActive { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
+        public int? SortOrderNo { get; set; }
+     
     }
 }

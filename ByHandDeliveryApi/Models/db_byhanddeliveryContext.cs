@@ -141,6 +141,8 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.Longitude).HasColumnType("decimal(20, 6)");
                 entity.Property(e => e.DeliveryCityId).HasColumnName("DeliveryCityID");
 
+                entity.Property(e => e.SortOrderNo);
+
                 entity.Property(e => e.DeliveryCity)
                     .HasMaxLength(100)
                     .IsUnicode(false);

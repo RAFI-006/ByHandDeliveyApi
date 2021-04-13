@@ -181,6 +181,9 @@ namespace ByHandDeliveryApi.Controllers
             else if(tblOrders.OrderStatusId == 12)
 
                 _notificationMsg = "Your order is sucessfully delivered to the delivered address";
+            else if (tblOrders.OrderStatusId == 18)
+
+                _notificationMsg = "Order has been cancelled by the user";
             var response = new GenericResponse<TblOrders>();
             try
             {
@@ -195,17 +198,12 @@ namespace ByHandDeliveryApi.Controllers
                     response.Message = SucessMessege;
                     response.HasError = false;
 
-              
-                    var result = await FireBaseService.PostNotifications(response.Result.Customer.FcmToken, "OrderId" + tblOrders.OrderId, _notificationMsg);
+                    if (tblOrders.OrderStatusId != 18)
+                      await FireBaseService.PostNotifications(response.Result.Customer.FcmToken, "OrderId" + tblOrders.OrderId, _notificationMsg);
 
-                    if (result.Success == 1)
-                    {
+                  else
+                        await FireBaseService.PostDeliveryBoyNotifications(response.Result.DeliveryPerson.Fcmtoken, "OrderId" + tblOrders.OrderId, _notificationMsg);
 
-                    }
-                    else
-                    {
-                
-                    }
                 }
                 else
                 {
