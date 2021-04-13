@@ -8,6 +8,7 @@ namespace ByHandDeliveryApi.Models
         public TblOrders()
         {
             TblOrderDeliveryAddress = new HashSet<TblOrderDeliveryAddress>();
+            TblDeliveryPersonCancelOrderDetails = new HashSet<TblDeliveryPersonCancelOrderDetails>();
         }
 
         public int OrderId { get; set; }
@@ -44,5 +45,6 @@ namespace ByHandDeliveryApi.Models
         public TblCustomers Customer { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }
         public ICollection<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
+        public ICollection<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonCancelOrderDetails { get; set; }
     }
 }

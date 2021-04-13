@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using ByHandDeliveryApi.Models;
 
 namespace ByHandDeliveryApi.Models
 {
@@ -19,7 +20,7 @@ namespace ByHandDeliveryApi.Models
         public virtual DbSet<TblDdvalues> TblDdvalues { get; set; }
         public virtual DbSet<TblDeliveryCity> TblDeliveryCity { get; set; }
         public virtual DbSet<TblDeliveryPerson> TblDeliveryPerson { get; set; }
-        public virtual DbSet<TblDeliveryPersonAccountDetails> TblDeliveryPersonAccountDetails { get; set; }
+        public virtual DbSet<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonAccountDetails { get; set; }
         public virtual DbSet<TblDropDown> TblDropDown { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
@@ -286,34 +287,71 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<TblDeliveryPersonAccountDetails>(entity =>
+            modelBuilder.Entity<TblDeliveryPersonPaymentTransactionDetails>(entity =>
             {
-                entity.HasKey(e => e.DeliveryPersonAccountDetailId);
+                entity.HasKey(e => e.DeliveryPersonAccountDetailID);
 
-                entity.ToTable("tbl_DeliveryPersonAccountDetails");
+                entity.ToTable("tbl_DeliveryPersonPaymentTransactionDetails");
 
-                entity.Property(e => e.DeliveryPersonAccountDetailId).HasColumnName("DeliveryPersonAccountDetailID");
+                entity.Property(e => e.DeliveryPersonAccountDetailID).HasColumnName("DeliveryPersonAccountDetailID");
 
                 entity.Property(e => e.CrDr)
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
+                entity.Property(e => e.DeliveryPersonID).HasColumnName("DeliveryPersonID");
 
                 entity.Property(e => e.PaymentType)
                     .IsRequired()
                     .HasMaxLength(500)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Comment)
+                .IsUnicode(false);
+
+
                 entity.Property(e => e.TransactionDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.DeliveryPerson)
-                    .WithMany(p => p.TblDeliveryPersonAccountDetails)
-                    .HasForeignKey(d => d.DeliveryPersonId)
+                    .WithMany(p => p.TblDeliveryPersonPaymentTransactionDetails)
+                    .HasForeignKey(d => d.DeliveryPersonID)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tbl_DeliveryPersonAccountDetails_tbl_DeliveryPerson");
             });
+
+
+            modelBuilder.Entity<TblDeliveryPersonCancelOrderDetails>(entity =>
+            {
+                entity.HasKey(e => e.DeliveryPersonCancelOrderDetailID);
+                entity.ToTable("tbl_DeliveryPersonCancelOrderDetails");
+
+
+                entity.Property(e => e.DeliveryPersonCancelOrderDetailID).HasColumnName("DeliveryPersonCancelOrderDetailID");
+                entity.Property(e => e.DeliveryPersonID).HasColumnName("DeliveryPersonID");
+                entity.Property(e => e.OrderID).HasColumnName("OrderID");
+                entity.Property(e => e.CancellationFee).HasColumnName("CancellationFee");
+                entity.Property(e => e.CancellationDate).HasColumnName("CancellationDate").HasColumnType("datetime");
+
+                entity.HasOne(d => d.DeliveryPerson)
+                  .WithMany(p => p.TblDeliveryPersonCancelOrderDetails)
+                  .HasForeignKey(d => d.DeliveryPersonID)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_tbL_DeliveryPersonCancelOrderDetails_tbl_DeliveryPerson");
+
+                entity.HasOne(d => d.Orders)
+               .WithMany(p => p.TblDeliveryPersonCancelOrderDetails)
+               .HasForeignKey(d => d.OrderID)
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_tbL_DeliveryPersonCancelOrderDetails_tbl_Orders");
+
+
+
+
+            }
+
+
+                );
 
             modelBuilder.Entity<TblDropDown>(entity =>
             {
@@ -499,5 +537,7 @@ namespace ByHandDeliveryApi.Models
                     .IsUnicode(false);
             });
         }
+
+        public DbSet<ByHandDeliveryApi.Models.TblDeliveryPersonPaymentTransactionDetails> TblDeliveryPersonPaymentTransactionDetails { get; set; }
     }
 }

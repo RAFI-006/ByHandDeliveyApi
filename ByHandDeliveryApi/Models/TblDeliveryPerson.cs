@@ -7,8 +7,9 @@ namespace ByHandDeliveryApi.Models
     {
         public TblDeliveryPerson()
         {
-            TblDeliveryPersonAccountDetails = new HashSet<TblDeliveryPersonAccountDetails>();
+            TblDeliveryPersonPaymentTransactionDetails = new HashSet<TblDeliveryPersonPaymentTransactionDetails>();
             TblOrders = new HashSet<TblOrders>();
+            TblDeliveryPersonCancelOrderDetails = new HashSet<TblDeliveryPersonCancelOrderDetails>();
         }
 
         public int DeliveryPersonId { get; set; }
@@ -48,7 +49,9 @@ namespace ByHandDeliveryApi.Models
         public bool? IsVerified { get; set; }
         public string Fcmtoken { get; set; }
 
-        public ICollection<TblDeliveryPersonAccountDetails> TblDeliveryPersonAccountDetails { get; set; }
+        public ICollection<TblDeliveryPersonPaymentTransactionDetails> TblDeliveryPersonPaymentTransactionDetails { get; set; }
+        public ICollection<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonCancelOrderDetails { get; set; }
+
         public ICollection<TblOrders> TblOrders { get; set; }
     }
 }

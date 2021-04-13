@@ -32,43 +32,43 @@ namespace ByHandDeliveryApi.Controllers
         }
 
 
-        [HttpGet("GetAccountDetails")]
-        public IActionResult GetAccountDetails(int deliveryPersonId)
-        {
-            var response = new GenericResponse<List<TblDeliveryPerson>>();
+        //[HttpGet("GetAccountDetails")]
+        //public IActionResult GetAccountDetails(int deliveryPersonId)
+        //{
+        //    var response = new GenericResponse<List<TblDeliveryPerson>>();
 
-            try
-            {
-                // var parameter = new SqlParameter("@DropDownKey", "weight");
-                var data = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryPersonId).Include(p => p.TblDeliveryPersonAccountDetails).ToList();
-                // var result = _context.Database.ExecuteSqlCommand("prDDValue", parameter);
+        //    try
+        //    {
+        //        // var parameter = new SqlParameter("@DropDownKey", "weight");
+        //        var data = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryPersonId).Include(p => p.TblDeliveryPersonAccountDetails).ToList();
+        //        // var result = _context.Database.ExecuteSqlCommand("prDDValue", parameter);
 
-                //var check = _context.TblDropDown.Include(p => p.TblDdvalues).Where(p=>p.Ddname ==  "Weight").ToList();
-
-
-
-                //   var productCategory = "Electronics";
+        //        //var check = _context.TblDropDown.Include(p => p.TblDdvalues).Where(p=>p.Ddname ==  "Weight").ToList();
 
 
-                var list = new List<DeliveryPersonDto>();
-                //foreach (var item in data)
-                //{
-                //    list.Add(_mapper.Map<DeliveryPersonDto>(item));
-                //}
 
-                response.HasError = false;
-                response.Message = _successMsg;
-                response.Result = data;
-            }
-            catch (Exception e)
-            {
-                response.Message = e.Message;
-                response.HasError = false;
-            }
+        //        //   var productCategory = "Electronics";
 
 
-            return response.ToHttpResponse();
-        }
+        //        var list = new List<DeliveryPersonDto>();
+        //        //foreach (var item in data)
+        //        //{
+        //        //    list.Add(_mapper.Map<DeliveryPersonDto>(item));
+        //        //}
+
+        //        response.HasError = false;
+        //        response.Message = _successMsg;
+        //        response.Result = data;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        response.Message = e.Message;
+        //        response.HasError = false;
+        //    }
+
+
+        //    return response.ToHttpResponse();
+        //}
 
 
         // GET: api/DeliveryPersons

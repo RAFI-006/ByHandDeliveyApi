@@ -34,8 +34,8 @@ namespace ByHandDeliveryApi.DTO
           //  CreateMap<OrderRequest,TblOrders>().ForMember(c => c.TblOrderDeliveryAddress, opt => opt.Ignore());
 
 
-            CreateMap<DeliveryPersonAccountDetailsDto, TblDeliveryPersonAccountDetails>().ForMember(t=>t.DeliveryPerson,  opt => opt.Ignore());
-            CreateMap<TblDeliveryPersonAccountDetails,DeliveryPersonAccountDetailsDto>();
+            CreateMap<DeliveryPersonAccountDetailsDto, TblDeliveryPersonCancelOrderDetails>().ForMember(t=>t.DeliveryPerson,  opt => opt.Ignore());
+            CreateMap<TblDeliveryPersonCancelOrderDetails,DeliveryPersonAccountDetailsDto>();
         }
     }
 }
