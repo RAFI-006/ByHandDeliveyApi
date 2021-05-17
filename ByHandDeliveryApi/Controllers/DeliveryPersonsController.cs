@@ -12,6 +12,7 @@ using ByHandDeliveryApi.GenericResponses;
 using System.Data.SqlClient;
 using ByHandDeliveryApi.Services;
 using System.Web.Http.Cors;
+using ByHandDeliveryApi.DataModel;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -99,6 +100,143 @@ namespace ByHandDeliveryApi.Controllers
 
             return response.ToHttpResponse();
         }
+
+
+
+        [HttpGet("OrderTransactionDetails")]
+        public IActionResult GetOrderTransactionDetails(int id)
+        {
+            var response = new GenericResponse<List<TransactionDetailModel>>();
+
+            try
+            {
+                var data = _context.TblDeliveryPerson.Where(p=>p.DeliveryPersonId == id).Include(p=>p.TblOrders).Include(p=>p.TblDeliveryPersonCancelOrderDetails).Include(p => p.TblDeliveryPersonPaymentTransactionDetails).FirstOrDefault();
+                var list = new List<TransactionDetailModel>();
+                foreach (var item in data.TblOrders)
+                {
+                    if(item.OrderStatusId ==12)
+                    list.Add(new TransactionDetailModel
+                    {
+                        OrderId = item.OrderId,
+                        Date =item.CreatedDate,
+                        TotalAmount = item.OrderAmount,
+                        CommisionFee = item.CommissionFee,
+                        DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
+                        PaymentType = item.PaymentTypeId == 6? "Cash" : "Online",
+                        PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
+
+
+
+
+
+
+
+                    });
+            }
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = list;
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+
+
+            return response.ToHttpResponse();
+        }
+
+
+        [HttpGet("TotalChargesDetails")]
+        public IActionResult TotalChargesDetails(int id)
+        {
+            var response = new GenericResponse<LiesureModel>();
+            LiesureModel calData =  new LiesureModel {
+                DeliveryPersonCharges =0,
+                CashReceivedFromOrder =0,
+                AmountRecievedByCompany =0,
+                CancellationFee =0,
+                AmountPaidToCompany =0,
+                BalanceAmount =0
+
+
+            };
+            try
+            {
+                var data = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == id).Include(p => p.TblOrders).Include(p => p.TblDeliveryPersonCancelOrderDetails).Include(p => p.TblDeliveryPersonPaymentTransactionDetails).FirstOrDefault();
+                var list = new List<TransactionDetailModel>();
+                foreach (var item in data.TblOrders)
+                {
+                    if (item.OrderStatusId == 12)
+                        list.Add(new TransactionDetailModel
+                        {
+                            OrderId = item.OrderId,
+                            Date = item.CreatedDate,
+                            TotalAmount = item.OrderAmount,
+                            CommisionFee = item.CommissionFee,
+                            DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
+                            PaymentType = item.PaymentTypeId == 6 ? "Cash" : "Online",
+                            PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
+
+
+
+
+
+
+
+                        });
+                }
+
+                //data from orderTabe
+                foreach (var item in list)
+                {
+
+                    calData.DeliveryPersonCharges = calData.DeliveryPersonCharges + item.DeliveyPersonCharge;
+
+                    if (item.PaymentType == "Cash")
+                        calData.CashReceivedFromOrder = calData.CashReceivedFromOrder + item.TotalAmount;
+
+
+                }
+
+            
+                //for Payment Transaction Calculation
+                foreach (var item in data.TblDeliveryPersonPaymentTransactionDetails)
+                {
+                    if (item.CrDr == "Credit")
+                        calData.AmountRecievedByCompany = calData.AmountRecievedByCompany + item.Amount;
+                    else if(item.CrDr == "Debit")
+
+                        calData.AmountPaidToCompany = calData.AmountPaidToCompany + item.Amount;
+                }
+
+                foreach(var item in data.TblDeliveryPersonCancelOrderDetails)
+                {
+
+                    calData.CancellationFee = calData.CancellationFee + item.CancellationFee;
+
+
+
+                }
+                calData.BalanceAmount = (calData.DeliveryPersonCharges + calData.AmountPaidToCompany) - (Convert.ToDecimal(calData.CashReceivedFromOrder) + calData.AmountRecievedByCompany + calData.CancellationFee);
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = calData;
+               
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+
+
+            return response.ToHttpResponse();
+        }
+
 
         [HttpPut("ResetPassword")]
         public IActionResult ResetPassword(string phone, String password)

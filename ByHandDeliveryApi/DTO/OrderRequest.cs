@@ -37,6 +37,8 @@ namespace ByHandDeliveryApi.DTO
         public string PromoCode { get; set; }
         public int? Discount { get; set; }
         public int? PointRedemption { get; set; }
+        public decimal? CommissionFee { get; set; }
+
         public OrderDeliveryAddDto OrderDeliveryAdd { get; set; }
     }
 }

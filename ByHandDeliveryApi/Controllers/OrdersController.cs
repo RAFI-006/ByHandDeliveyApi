@@ -261,11 +261,13 @@ namespace ByHandDeliveryApi.Controllers
                             OrderAmount = tblOrders.OrderAmount,
                             PaymentTypeId = tblOrders.PaymentTypeId,
                             OrderStatusId = tblOrders.OrderStatusId,
+                            PaymentStatusID = tblOrders.PaymentStatusID,
                             CreatedDate = tblOrders.CreatedDate,
                             FromLat = tblOrders.FromLat,
                             FromLong = tblOrders.FromLong,
                             Distance = tblOrders.Distance,
                             City = tblOrders.City,
+                            CommissionFee = tblOrders.CommissionFee,
                             PaymentFrom = tblOrders.PaymentFrom,
                             ProductImage = tblOrders.ProductImage
 
@@ -354,7 +356,10 @@ namespace ByHandDeliveryApi.Controllers
                         Distance = tblOrders.Distance,
                         City = tblOrders.City,
                         PaymentFrom = tblOrders.PaymentFrom,
-                        ProductImage = tblOrders.ProductImage
+                        ProductImage = tblOrders.ProductImage,
+                        CommissionFee =tblOrders.CommissionFee,
+                        PaymentStatusID = tblOrders.PaymentStatusID
+
 
 
 

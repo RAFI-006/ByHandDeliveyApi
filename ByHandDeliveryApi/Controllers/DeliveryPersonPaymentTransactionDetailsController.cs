@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ByHandDeliveryApi.Models;
+using ByHandDeliveryApi.GenericResponses;
+using ByHandDeliveryApi.DTO;
+using AutoMapper;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -14,18 +17,78 @@ namespace ByHandDeliveryApi.Controllers
     public class DeliveryPersonPaymentTransactionDetailsController : ControllerBase
     {
         private readonly db_byhanddeliveryContext _context;
+        private readonly IMapper _mapper;
+        private readonly string _successMsg = "Sucessfully Completed";
 
-        public DeliveryPersonPaymentTransactionDetailsController(db_byhanddeliveryContext context)
+        public DeliveryPersonPaymentTransactionDetailsController(db_byhanddeliveryContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/DeliveryPersonPaymentTransactionDetails
         [HttpGet]
-        public IEnumerable<TblDeliveryPersonPaymentTransactionDetails> GetTblDeliveryPersonPaymentTransactionDetails()
+        public IActionResult GetTblDeliveryPersonPaymentTransactionDetails()
         {
-            return _context.TblDeliveryPersonPaymentTransactionDetails;
+
+            var response = new GenericResponse<List<DeliveryPersonPaymentTransactionDetailsDTO>>();
+
+            try
+            {
+                var data = _context.TblDeliveryPersonPaymentTransactionDetails.ToList();
+                var list = new List<DeliveryPersonPaymentTransactionDetailsDTO>();
+                foreach (var item in data)
+                {
+                    list.Add(_mapper.Map<DeliveryPersonPaymentTransactionDetailsDTO>(item));
+                }
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = list;
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+
+
+            return response.ToHttpResponse();
         }
+
+
+
+
+        [HttpGet("GetTransactionDetailById")]
+        public IActionResult GetTransactionDetailById(int id)
+        {
+
+            var response = new GenericResponse<List<DeliveryPersonPaymentTransactionDetailsDTO>>();
+
+            try
+            {
+                var data = _context.TblDeliveryPersonPaymentTransactionDetails.Where(p=>p.DeliveryPersonID == id).ToList();
+                var list = new List<DeliveryPersonPaymentTransactionDetailsDTO>();
+                foreach (var item in data)
+                {
+                    list.Add(_mapper.Map<DeliveryPersonPaymentTransactionDetailsDTO>(item));
+                }
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = list;
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+
+
+            return response.ToHttpResponse();
+        }
+
+
 
         // GET: api/DeliveryPersonPaymentTransactionDetails/5
         [HttpGet("{id}")]
@@ -83,17 +146,35 @@ namespace ByHandDeliveryApi.Controllers
 
         // POST: api/DeliveryPersonPaymentTransactionDetails
         [HttpPost]
-        public async Task<IActionResult> PostTblDeliveryPersonPaymentTransactionDetails([FromBody] TblDeliveryPersonPaymentTransactionDetails tblDeliveryPersonPaymentTransactionDetails)
+        public  IActionResult PostTblDeliveryPersonPaymentTransactionDetails([FromBody] DeliveryPersonPaymentTransactionDetailsDTO data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _context.TblDeliveryPersonPaymentTransactionDetails.Add(tblDeliveryPersonPaymentTransactionDetails);
-            await _context.SaveChangesAsync();
+            GenericResponse<string> responses = new GenericResponse<string>();
+            try
+            {
 
-            return CreatedAtAction("GetTblDeliveryPersonPaymentTransactionDetails", new { id = tblDeliveryPersonPaymentTransactionDetails.DeliveryPersonAccountDetailID }, tblDeliveryPersonPaymentTransactionDetails);
+                var mapppedData = _mapper.Map<TblDeliveryPersonPaymentTransactionDetails>(data);
+                _context.Add(mapppedData);
+                _context.SaveChanges();
+                var res = _context.TblDeliveryPersonPaymentTransactionDetails.Where(p => p.DeliveryPersonAccountDetailID == data.DeliveryPersonAccountDetailID).FirstOrDefault();
+
+
+                responses.Result = "Created Successfully";
+                responses.Message = "Successfull";
+                responses.HasError = false;
+
+            }
+            catch (Exception e)
+            {
+                responses.Message = e.Message;
+                responses.HasError = true;
+            }
+
+            return responses.ToHttpResponse();
         }
 
         // DELETE: api/DeliveryPersonPaymentTransactionDetails/5

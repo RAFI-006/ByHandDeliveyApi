@@ -20,11 +20,12 @@ namespace ByHandDeliveryApi.Models
         public virtual DbSet<TblDdvalues> TblDdvalues { get; set; }
         public virtual DbSet<TblDeliveryCity> TblDeliveryCity { get; set; }
         public virtual DbSet<TblDeliveryPerson> TblDeliveryPerson { get; set; }
-        public virtual DbSet<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonAccountDetails { get; set; }
+        public virtual DbSet<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonCancelOrderDetails { get; set; }
         public virtual DbSet<TblDropDown> TblDropDown { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
         public virtual DbSet<TblUsers> TblUsers { get; set; }
+        public virtual DbSet<TblDeliveryPersonPaymentTransactionDetails> TblDeliveryPersonPaymentTransactionDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -459,6 +460,7 @@ namespace ByHandDeliveryApi.Models
                 entity.Property(e => e.FromLat).HasColumnType("decimal(20, 6)");
 
                 entity.Property(e => e.FromLong).HasColumnType("decimal(20, 6)");
+                entity.Property(e => e.CommissionFee).HasColumnType("decimal(10, 2)");
 
                 entity.Property(e => e.GoodsType)
                     .HasMaxLength(100)
@@ -538,6 +540,5 @@ namespace ByHandDeliveryApi.Models
             });
         }
 
-        public DbSet<ByHandDeliveryApi.Models.TblDeliveryPersonPaymentTransactionDetails> TblDeliveryPersonPaymentTransactionDetails { get; set; }
-    }
+       }
 }

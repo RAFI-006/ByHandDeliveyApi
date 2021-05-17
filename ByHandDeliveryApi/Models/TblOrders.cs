@@ -40,7 +40,9 @@ namespace ByHandDeliveryApi.Models
         public int? Discount { get; set; }
         public int? PointRedemption { get; set; }
         public int? PaymentStatusID { get; set; }
-       
+        public decimal? CommissionFee { get; set; }
+
+
 
         public TblCustomers Customer { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }
