@@ -24,7 +24,7 @@ namespace ByHandDeliveryApi.Controllers
         private readonly db_byhanddeliveryContext _context;
         private readonly IMapper _mapper;
         private readonly string _successMsg = "Successfully Completed";
-
+        private readonly string ConnectionString = Startup.ConnectionString;
 
         public DeliveryPersonsController(db_byhanddeliveryContext context, IMapper mapper)
         {
@@ -77,7 +77,6 @@ namespace ByHandDeliveryApi.Controllers
         public IActionResult GetTblDeliveryPerson()
         {
             var response = new GenericResponse<List<DeliveryPersonDto>>();
-
             try
             {
                 var data = _context.TblDeliveryPerson.ToList();
@@ -96,8 +95,6 @@ namespace ByHandDeliveryApi.Controllers
                 response.Message = e.Message;
                 response.HasError = false;
             }
-
-
             return response.ToHttpResponse();
         }
 
@@ -124,11 +121,6 @@ namespace ByHandDeliveryApi.Controllers
                         DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
                         PaymentType = item.PaymentTypeId == 6? "Cash" : "Online",
                         PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
-
-
-
-
-
 
 
                     });
@@ -179,26 +171,16 @@ namespace ByHandDeliveryApi.Controllers
                             DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
                             PaymentType = item.PaymentTypeId == 6 ? "Cash" : "Online",
                             PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
-
-
-
-
-
-
-
-                        });
+                     });
                 }
 
                 //data from orderTabe
                 foreach (var item in list)
                 {
-
                     calData.DeliveryPersonCharges = calData.DeliveryPersonCharges + item.DeliveyPersonCharge;
 
                     if (item.PaymentType == "Cash")
                         calData.CashReceivedFromOrder = calData.CashReceivedFromOrder + item.TotalAmount;
-
-
                 }
 
             
@@ -214,11 +196,7 @@ namespace ByHandDeliveryApi.Controllers
 
                 foreach(var item in data.TblDeliveryPersonCancelOrderDetails)
                 {
-
                     calData.CancellationFee = calData.CancellationFee + item.CancellationFee;
-
-
-
                 }
                 calData.BalanceAmount = (calData.DeliveryPersonCharges + calData.AmountPaidToCompany) - (Convert.ToDecimal(calData.CashReceivedFromOrder) + calData.AmountRecievedByCompany + calData.CancellationFee);
 
@@ -314,7 +292,7 @@ namespace ByHandDeliveryApi.Controllers
             return response.ToHttpResponse();
 
         }
-
+        
         // GET: api/DeliveryPersons/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTblDeliveryPerson([FromRoute] int id)
@@ -323,15 +301,15 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            GenericResponse<DeliveryPersonDto> response = new GenericResponse<DeliveryPersonDto>();
             var tblDeliveryPerson = await _context.TblDeliveryPerson.FindAsync(id);
-
+            response.Result = _mapper.Map<DeliveryPersonDto>(tblDeliveryPerson);
             if (tblDeliveryPerson == null)
             {
                 return NotFound();
             }
 
-            return Ok(tblDeliveryPerson);
+            return response.ToHttpResponse();
         }
 
         // PUT: api/DeliveryPersons/5
@@ -349,14 +327,10 @@ namespace ByHandDeliveryApi.Controllers
                 if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonId))
                 {
                 
-                        _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
+                    _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
                     _context.SaveChanges();
                     var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == tblDeliveryPerson.MobileNo).FirstOrDefault();
                     response.Result = _mapper.Map<DeliveryPersonDto>(res);
-
-
-
-               
 
                     response.Message = "Successfull";
                     response.HasError = false;
@@ -365,19 +339,191 @@ namespace ByHandDeliveryApi.Controllers
                 {
                     response.Message = "User not found";
                     response.HasError = true;
-
                 }
-
             }
             catch (Exception e)
             {
                 response.Message = e.Message;
                 response.HasError = true;
-
             }
 
             return response.ToHttpResponse();
         }
+
+
+        // PUT: api/DeliveryPersonKYCDetails/5
+        [HttpPut ("UpdateDeliveryPersonKYCDetails")]
+        public async Task<IActionResult>UpdateDeliveryPersonKYCDetails([FromBody] DeliveryPersonDetailDto data)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            GenericResponse<DeliveryPersonDetailDto> response = new GenericResponse<DeliveryPersonDetailDto>();
+            try
+            {
+                if (TblDeliveryPersonDetailExists(data.DeliveryPersonId))
+                {
+
+                    using (SqlConnection sql = new SqlConnection(ConnectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("prUpdateDeliveryPersonKYCInfo", sql))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", data.DeliveryPersonId));
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarNo", data.AadhaarNo));
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarFrontImage", data.AadhaarFrontImage));
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarBackImage", data.AadhaarBackImage));
+                            cmd.Parameters.Add(new SqlParameter("@PAN", data.Pan));
+                            cmd.Parameters.Add(new SqlParameter("@PANImage", data.Panimage));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceNo", data.DrivingLicenceNo));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceFrontImage", data.DrivingLicenceFrontImage));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceBackImage", data.DrivingLicenceBackImage));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleNo", data.VehicleNo));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleDocumentImage", data.VehicleDocumentImage));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleFrontPhoto", data.VehicleFrontPhoto));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleBackPhoto", data.VehicleBackPhoto));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleInsuranceNo", data.VehicleInsuranceNo));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleInsuranceDocumentImage", data.VehicleInsuranceDocumentImage));
+                            cmd.Parameters.Add(new SqlParameter("@AccountName", data.AccountName));
+                            cmd.Parameters.Add(new SqlParameter("@AccountNo", data.AccountNo));
+                            cmd.Parameters.Add(new SqlParameter("@BankName", data.BankName));
+                            cmd.Parameters.Add(new SqlParameter("@IFSC", data.Ifsc));
+                            cmd.Parameters.Add(new SqlParameter("@CanceledChequeImage", data.CanceledChequeImage));
+                            sql.Open();
+                            cmd.ExecuteNonQuery();
+                            sql.Close();
+                            var res = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonId == data.DeliveryPersonId).FirstOrDefault();
+                            response.Result = _mapper.Map<DeliveryPersonDetailDto>(res);
+                            response.Message = "Successfull";
+                            response.HasError = false;
+                        }
+                    }
+                }
+                else
+                {
+                    response.Message = "User not found";
+                    response.HasError = true;
+                }
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = true;
+            }
+            return response.ToHttpResponse();
+        }
+
+
+        // GET: api/DeliveryPersonKYCDetails
+        [HttpGet("DeliveryPersonKYCDetails")]
+        public IActionResult DeliveryPersonKYCDetails()
+        {
+            var response = new GenericResponse<List<DeliveryPersonDetailDto>>();
+            try
+            {
+                var data = _context.TblDeliveryPersonDetails.ToList();
+                var list = new List<DeliveryPersonDetailDto>();
+                foreach (var item in data)
+                {
+                    list.Add(_mapper.Map<DeliveryPersonDetailDto>(item));
+                }
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = list;
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+            return response.ToHttpResponse();
+        }
+
+
+        // GET: api/DeliveryPersonKYCDetails/25
+        [HttpGet("DeliveryPersonKYCDetailsByID")]
+        
+        public  IActionResult DeliveryPersonKYCDetailsByID( int id)
+        {
+            var response = new GenericResponse<DeliveryPersonDetailDto>();
+
+            try
+            {
+                var data = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonId == id).First();
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = _mapper.Map<DeliveryPersonDetailDto>(data);
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+            return response.ToHttpResponse();
+        }
+
+
+        // GET: api/DeliveryPersonKYCDetails/25
+        [HttpGet("DeliveryPersonWalletByID")]
+
+        public IActionResult DeliveryPersonWalletByID(int id)
+        {
+            var response = new GenericResponse<DeliveryPersonWalletDto>();
+
+            try
+            {
+                var data = _context.TblDeliveryPersonWallet.Where(p => p.DeliveryPersonID == id).First();
+
+                response.HasError = false;
+                response.Message = _successMsg;
+                response.Result = _mapper.Map<DeliveryPersonWalletDto>(data);
+            }
+            catch (Exception e)
+            {
+                response.Message = e.Message;
+                response.HasError = false;
+            }
+            return response.ToHttpResponse();
+        }
+
+
+        [HttpPut("UpdateDeliveryPersonWallet")]
+        public IActionResult UpdateDeliveryPersonWallet(int DeliveryPersonID, int Wallet )
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = new GenericResponse<String>();
+            try
+            {
+                var tblDeliveryPersonWallet  = _context.TblDeliveryPersonWallet.Where(p => p.DeliveryPersonID == DeliveryPersonID).FirstOrDefault();
+                if (tblDeliveryPersonWallet == null)
+                {
+                    response.HasError = true;
+                    response.Message = "DeliveryPersonID is not valid";
+                }
+                else
+                {
+                    tblDeliveryPersonWallet.Wallet = Wallet;
+                    _context.TblDeliveryPersonWallet.Update(tblDeliveryPersonWallet);
+                    _context.SaveChanges();
+                    response.HasError = false;
+                    response.Message = _successMsg;
+                    response.Result = "Wallet Successfully Updated";
+                }
+            }
+            catch (Exception e)
+            {
+                response.HasError = true;
+                response.Message = e.Message;
+            }
+            return response.ToHttpResponse();
+        }
+
 
 
         [HttpPut("VerifyDeliveryBoy")]
@@ -387,7 +533,7 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            
             GenericResponse<string> response = new GenericResponse<string>();
             try
             {
@@ -399,9 +545,6 @@ namespace ByHandDeliveryApi.Controllers
                     _context.SaveChanges();
                     var res = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryBoyId).FirstOrDefault();
 
-
-
-
                     if (res.IsVerified == true)
                     {
                         response.Result = "Your a verified user";
@@ -411,8 +554,6 @@ namespace ByHandDeliveryApi.Controllers
                     {
                         response.Result = "Your Verification is on hold";
                         await FireBaseService.PostDeliveryBoyNotifications(res.Fcmtoken, "Verification Msg", "Your Verification is on hold , Pls contact the Support Team");
-
-
                     }
 
                     response.Message = "Successfull";
@@ -422,17 +563,13 @@ namespace ByHandDeliveryApi.Controllers
                 {
                     response.Message = "User not found";
                     response.HasError = true;
-
                 }
-
             }
             catch (Exception e)
             {
                 response.Message = e.Message;
                 response.HasError = true;
-
             }
-
             return response.ToHttpResponse();
         }
 
@@ -445,35 +582,72 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-           
             GenericResponse<DeliveryPersonDto> responses = new GenericResponse<DeliveryPersonDto>();
             try
             {
                 if (!TblDeliveryPersonExists(data.MobileNo))
                 {
-                    _context.Add(_mapper.Map<TblDeliveryPerson>(data));
-                    _context.SaveChanges();
-                    var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == data.MobileNo).FirstOrDefault();
-                    responses.Result = _mapper.Map<DeliveryPersonDto>(res);
-                    responses.Message = "Successfull";
-                    responses.HasError = false;
+                    using (SqlConnection sql = new SqlConnection(ConnectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("prInsertDeliveryPerson", sql))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.Parameters.Add(new SqlParameter("@PersonName", data.PersonName));
+                            cmd.Parameters.Add(new SqlParameter("@MobileNo", data.MobileNo));
+                            cmd.Parameters.Add(new SqlParameter("@AlternateNo", data.AlternateNo));
+                            cmd.Parameters.Add(new SqlParameter("@Address", data.Address));
+                            cmd.Parameters.Add(new SqlParameter("@City", data.City));
+                            cmd.Parameters.Add(new SqlParameter("@Pincode", data.Pincode));
+                            cmd.Parameters.Add(new SqlParameter("@EmailID", data.EmailID));
+                            cmd.Parameters.Add(new SqlParameter("@Password", data.Password));
+                            cmd.Parameters.Add(new SqlParameter("@FCMToken", data.Fcmtoken));
+                            cmd.Parameters.Add(new SqlParameter("@ReferPromoCode", data.ReferPromoCode));
+                            cmd.Parameters.Add(new SqlParameter("@ProfileImage", data.ProfileImage));
+
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarNo", data.AadhaarNo));
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarFrontImage", data.AadhaarFrontImage));
+                            cmd.Parameters.Add(new SqlParameter("@AadhaarBackImage", data.AadhaarBackImage));
+                            cmd.Parameters.Add(new SqlParameter("@PAN", data.Pan));
+                            cmd.Parameters.Add(new SqlParameter("@PANImage", data.Panimage));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceNo", data.DrivingLicenceNo));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceFrontImage", data.DrivingLicenceFrontImage));
+                            cmd.Parameters.Add(new SqlParameter("@DrivingLicenceBackImage", data.DrivingLicenceBackImage));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleNo", data.VehicleNo));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleDocumentImage", data.VehicleDocumentImage));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleFrontPhoto", data.VehicleFrontPhoto));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleBackPhoto", data.VehicleBackPhoto));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleInsuranceNo", data.VehicleInsuranceNo));
+                            cmd.Parameters.Add(new SqlParameter("@VehicleInsuranceDocumentImage", data.VehicleInsuranceDocumentImage));
+                            cmd.Parameters.Add(new SqlParameter("@AccountName", data.AccountName));
+                            cmd.Parameters.Add(new SqlParameter("@AccountNo", data.AccountNo));
+                            cmd.Parameters.Add(new SqlParameter("@BankName", data.BankName ));
+                            cmd.Parameters.Add(new SqlParameter("@IFSC", data.Ifsc));
+                            cmd.Parameters.Add(new SqlParameter("@CanceledChequeImage", data.CanceledChequeImage));
+                            sql.OpenAsync();
+                            cmd.ExecuteNonQueryAsync();
+                            var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == data.MobileNo).FirstOrDefault();
+                            responses.Result = _mapper.Map<DeliveryPersonDto>(res);
+                            responses.Message = "Successfull";
+                            responses.HasError = false;
+                        }
+                    }
                 }
                 else
                 {
                     responses.Message = "User Already Exist";
                     responses.HasError = false;
                 }
-
             }
             catch (Exception e)
             {
                 responses.Message = e.Message;
                 responses.HasError = true;
             }
-
             return responses.ToHttpResponse();
         }
+
+
+       
 
         [HttpGet("IsNumberRegistered")]
         public IActionResult IsUserRegisered(string number)
@@ -482,9 +656,7 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             GenericResponse<bool> responses = new GenericResponse<bool>();
-
             try
             {
                 var data = TblDeliveryPersonExists(number);
@@ -492,8 +664,6 @@ namespace ByHandDeliveryApi.Controllers
                 responses.HasError = false;
                 responses.Result = data;
                 responses.Message = _successMsg;
-
-
             }
             catch (Exception e)
             {
@@ -529,9 +699,14 @@ namespace ByHandDeliveryApi.Controllers
         {
             return _context.TblDeliveryPerson.Any(e => e.DeliveryPersonId == id);
         }
+
         private bool TblDeliveryPersonExists(string mobile)
         {
             return _context.TblDeliveryPerson.Any(e => e.MobileNo == mobile);
+        }
+        private bool TblDeliveryPersonDetailExists(int id)
+        {
+            return _context.TblDeliveryPersonDetails.Any(e => e.DeliveryPersonId == id);
         }
     }
 }

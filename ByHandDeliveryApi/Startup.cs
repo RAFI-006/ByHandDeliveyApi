@@ -33,8 +33,8 @@ namespace ByHandDeliveryApi
             Configuration = configuration;
         }
 
-
-       // readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        public static string ConnectionString;
+        // readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -68,6 +68,7 @@ namespace ByHandDeliveryApi
                 c.SwaggerDoc("v1", info: new Microsoft.OpenApi.Models.OpenApiInfo { Title = "ByHandDelivery", Version = "v1" });
             });
             services.AddDbContext<db_byhanddeliveryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("OnlineDeliveryConnectionString")));
+            ConnectionString = Configuration.GetConnectionString("OnlineDeliveryConnectionString");
             services.Configure<ProfileImagePathSetting>(Configuration.GetSection("ProfileImagePath"));
             services.Configure<ProductImagePathSetting>(Configuration.GetSection("ProductImagePath"));
             services.Configure<DocumentImagePathSetting>(Configuration.GetSection("DocumentImagePath"));

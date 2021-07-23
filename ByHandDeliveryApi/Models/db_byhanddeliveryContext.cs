@@ -20,7 +20,10 @@ namespace ByHandDeliveryApi.Models
         public virtual DbSet<TblDdvalues> TblDdvalues { get; set; }
         public virtual DbSet<TblDeliveryCity> TblDeliveryCity { get; set; }
         public virtual DbSet<TblDeliveryPerson> TblDeliveryPerson { get; set; }
+        public virtual DbSet<TblDeliveryPersonDetails> TblDeliveryPersonDetails  { get; set; }
         public virtual DbSet<TblDeliveryPersonCancelOrderDetails> TblDeliveryPersonCancelOrderDetails { get; set; }
+
+        public virtual DbSet<TblDeliveryPersonWallet> TblDeliveryPersonWallet { get; set; }
         public virtual DbSet<TblDropDown> TblDropDown { get; set; }
         public virtual DbSet<TblOrderDeliveryAddress> TblOrderDeliveryAddress { get; set; }
         public virtual DbSet<TblOrders> TblOrders { get; set; }
@@ -133,6 +136,29 @@ namespace ByHandDeliveryApi.Models
                     .HasConstraintName("FK_tbl_DDValues_tbl_DropDown");
             });
 
+
+
+            modelBuilder.Entity<TblDeliveryPersonWallet>(entity =>
+            {
+                entity.HasKey(e => e.DeliveryPersonWalletID );
+
+                entity.ToTable("tbl_DeliveryPersonWallet");
+
+                entity.Property(e => e.DeliveryPersonWalletID).HasColumnName("DeliveryPersonWalletID");
+
+
+                entity.Property(e => e.DeliveryPersonID).HasColumnName("DeliveryPersonID");
+
+                entity.Property(e => e.Wallet).HasColumnName("Wallet");
+
+                entity.HasOne(d => d.DeliveryPerson )
+                    .WithMany(p => p.TblDeliveryPersonWallet )
+                    .HasForeignKey(d => d.DeliveryPersonID)
+                    .HasConstraintName("FK_tbl_DeliveryPersonWallet_tbl_DeliveryPerson");
+            });
+
+
+
             modelBuilder.Entity<TblDeliveryCity>(entity =>
             {
                 entity.HasKey(e => e.DeliveryCityId);
@@ -158,135 +184,161 @@ namespace ByHandDeliveryApi.Models
 
                 entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
 
-                entity.Property(e => e.AadhaarBackImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
+                entity.Property(e => e.PersonName)
+                  .HasMaxLength(100)
+                  .IsUnicode(false);
 
-                entity.Property(e => e.AadhaarFrontImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.AadhaarNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.AccountName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.AccountNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Address)
-                    .HasMaxLength(1000)
-                    .IsUnicode(false);
+                entity.Property(e => e.MobileNo)
+                   .HasMaxLength(50)
+                   .IsUnicode(false);
 
                 entity.Property(e => e.AlternateNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.BankName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CanceledChequeImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
+                entity.Property(e => e.Address)
+                   .HasMaxLength(1000)
+                   .IsUnicode(false);
 
                 entity.Property(e => e.City)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Country)
+                entity.Property(e => e.Pincode)
+                  .HasMaxLength(10)
+                  .IsUnicode(false);
+
+                entity.Property(e => e.EmailID)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                   .HasMaxLength(100)
+                   .IsUnicode(false);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.DocumentBackImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
+                entity.Property(e => e.IsActive).HasColumnType("Boolean");
 
-                entity.Property(e => e.DocumentFrontImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DrivingLicenceBackImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DrivingLicenceFrontImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DrivingLicenceNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.IsVerified).HasColumnType("Boolean");
 
                 entity.Property(e => e.Fcmtoken)
                     .HasColumnName("FCMToken")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Ifsc)
-                    .HasColumnName("IFSC")
-                    .HasMaxLength(50)
+                entity.Property(e => e.MyPromocode)
+                   .HasMaxLength(20)
+                   .IsUnicode(false);
+
+                entity.Property(e => e.ReferPromocode)
+                   .HasMaxLength(20)
+                   .IsUnicode(false);
+
+
+                entity.Property(e => e.ProfileImage)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
-                entity.Property(e => e.MobileNo)
-                    .HasMaxLength(50)
+              
+            });
+
+            modelBuilder.Entity <TblDeliveryPersonDetails>(entity =>
+            {
+                entity.HasKey(e => e.DeliveryPersonDetailID);
+
+                entity.ToTable("tbl_DeliveryPersonDetails");
+
+                entity.Property(e => e.DeliveryPersonId).HasColumnName("DeliveryPersonID");
+
+                entity.Property(e => e.AadhaarNo)
+                 .HasMaxLength(50)
+                 .IsUnicode(false);
+
+                entity.Property(e => e.AadhaarBackImage)
+                 .HasMaxLength(500)
+                 .IsUnicode(false);
+
+                entity.Property(e => e.AadhaarFrontImage)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Pan)
-                    .HasColumnName("PAN")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                  .HasColumnName("PAN")
+                  .HasMaxLength(50)
+                  .IsUnicode(false);
 
                 entity.Property(e => e.Panimage)
                     .HasColumnName("PANImage")
                     .HasMaxLength(500)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Password)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.DrivingLicenceNo)
+               .HasMaxLength(50)
+               .IsUnicode(false);
 
-                entity.Property(e => e.PersonName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.DrivingLicenceFrontImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
 
-                entity.Property(e => e.Pincode)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProfileImage)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.VehicleBackPhoto)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.VehicleDocumemnt)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.VehicleFrontPhoto)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.VehicleInsuranceDocumentPhoto)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.VehicleInsuranceNo)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
+                entity.Property(e => e.DrivingLicenceBackImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
 
                 entity.Property(e => e.VehicleNo)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VehicleDocumentImage)
+               .HasMaxLength(500)
+               .IsUnicode(false);
+
+                entity.Property(e => e.VehicleFrontPhoto)
+              .HasMaxLength(500)
+              .IsUnicode(false);
+
+                entity.Property(e => e.VehicleBackPhoto)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+                entity.Property(e => e.VehicleInsuranceNo)
+                   .HasMaxLength(500)
+                   .IsUnicode(false);
+
+                entity.Property(e => e.VehicleInsuranceDocumentImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+                entity.Property(e => e.AccountName)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.Property(e => e.AccountNo)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+
+            entity.Property(e => e.BankName)
+                   .HasMaxLength(50)
+                   .IsUnicode(false);
+
+            entity.Property(e => e.Ifsc)
+            .HasColumnName("IFSC")
+            .HasMaxLength(50)
+            .IsUnicode(false);
+
+                entity.Property(e => e.CanceledChequeImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+
+
+                entity.HasOne(d => d.DeliveryPerson)
+                   .WithMany(p => p.tblDeliveryPersonDetails)
+                   .HasForeignKey(d => d.DeliveryPersonId)
+                   .HasConstraintName("FK_tbl_DeliveryPersonDetails_tbl_DeliveryPerson");
+
             });
+
 
             modelBuilder.Entity<TblDeliveryPersonPaymentTransactionDetails>(entity =>
             {

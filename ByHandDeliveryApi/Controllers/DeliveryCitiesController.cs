@@ -376,14 +376,14 @@ namespace ByHandDeliveryApi.Controllers
             try
             {
 
-
-                PlacesDetailResponse result = await _googleService.GetPlaceDetail(placeId);
+              PlacesDetailResponse result = await _googleService.GetPlaceDetail(placeId);
 
                 if (result.status == "OK")
                 {
                     response.HasError = false;
                     response.Message = _successMsg;
-                    response.Result = new PlaceDetailData {
+               
+                      response.Result = new PlaceDetailData {
                         FormattedAddress = result.result.formatted_address,
                         Geometry =  result.result.geometry
 
@@ -412,7 +412,7 @@ namespace ByHandDeliveryApi.Controllers
         [HttpPost("GetDistanceBetweenTwoPoints")]
         public async Task<IActionResult> GetDistanceBetweenTwoPoints([FromBody] LocationRequestModel model)
         {
-            GenericResponse<string> response = new GenericResponse<string>();
+            GenericResponse<DistanceMatrixResponse> response = new GenericResponse<DistanceMatrixResponse>();
 
             if (!ModelState.IsValid)
             {
@@ -421,15 +421,16 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
+                string source = model.SourceLat.ToString() + "," + model.SourceLong.ToString();
+                string des = model.DestLat.ToString() + "," + model.DestLong.ToString();
 
-
-                var result = GetDistanceFromLatLonInKm(model.SourceLat, model.SourceLong, model.DestLat, model.DestLong);
+                DistanceMatrixResponse result = await _googleService.GetDistanceMatrix(source,des);
 
                 if (result!=null)
                 {
                     response.HasError = false;
                     response.Message = _successMsg;
-                    response.Result = result.ToString();
+                    response.Result = result;
 
                 }
                 else

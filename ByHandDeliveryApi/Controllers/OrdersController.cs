@@ -72,10 +72,6 @@ namespace ByHandDeliveryApi.Controllers
             {
                 var data = _context.TblOrders.Include(p => p.Customer).Include(p => p.DeliveryPerson).Include(p => p.TblOrderDeliveryAddress).ToList().Where(p=>p.OrderStatusId==9).ToList();
 
-
-                
-
-
                 if (model.City == null && model.Distance ==0)
                 {
                     response.Message = SucessMessege;
@@ -360,10 +356,6 @@ namespace ByHandDeliveryApi.Controllers
                         CommissionFee =tblOrders.CommissionFee,
                         PaymentStatusID = tblOrders.PaymentStatusID
 
-
-
-
-
                     };
 
                     _context.Update(order);
@@ -430,11 +422,7 @@ namespace ByHandDeliveryApi.Controllers
                 response.Message = e.Message;
                 response.HasError = false;
             }
-
-
-
-
-            return response.ToHttpResponse();
+             return response.ToHttpResponse();
         }
 
 
