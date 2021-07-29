@@ -5,7 +5,7 @@ namespace ByHandDeliveryApi.Models
 {
     public partial class TblDeliveryCity
     {
-        public int DeliveryCityId { get; set; }
+        public int DeliveryCityID { get; set; }
         public string DeliveryCity { get; set; }
         public bool? IsActive { get; set; }
         public decimal? Latitude { get; set; }

@@ -8,7 +8,7 @@ namespace ByHandDeliveryApi.DTO
 {
     public class CustomersDto
     {
-        public int CustomerId { get; set; }
+        public int CustomerID { get; set; }
         public string CustomerName { get; set; }
         public string MobileNo { get; set; }
         public string Address { get; set; }

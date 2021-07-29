@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace ByHandDeliveryApi.DTO
 {
-    public class OrderRequest
+    public class OrderWithDeliveryDetailsDTO
     {
-
-        public int OrderID  { get; set; }
+        public int OrderID { get; set; }
         public int CustomerID { get; set; }
         public int? DeliveryPersonID { get; set; }
         public string PickupLocality { get; set; }
@@ -25,20 +24,25 @@ namespace ByHandDeliveryApi.DTO
         public string GoodsType { get; set; }
         public int? ParcelValue { get; set; }
         public int? OrderAmount { get; set; }
+        public int? SecurityFee { get; set; }
+        public decimal? CommissionFee { get; set; }
         public int? PaymentTypeID { get; set; }
+        public string PaymentType { get; set; }
+        public int? OrderStatusID { get; set; }
+        public string OrderStatus { get; set; }
         public int? PaymentStatusID { get; set; }
-        public int? OrderStatusID  { get; set; }
+        public string PaymentStatus  { get; set; }
         public DateTime? CreatedDate { get; set; }
         public decimal? FromLat { get; set; }
         public decimal? FromLong { get; set; }
-        
         public string PaymentFrom { get; set; }
         public string ProductImage { get; set; }
         public string PromoCode { get; set; }
         public int? Discount { get; set; }
         public int? PointRedemption { get; set; }
-        public decimal? CommissionFee { get; set; }
 
-        public OrderDeliveryAddDto OrderDeliveryAdd { get; set; }
+        public OrderCustomerDTO  Customer { get; set; }
+        public OrderDeliveryPersonDTO  DeliveryPerson { get; set; }
+        public OrderDeliveryAddDto [] OrderDeliveryAdd { get; set; }
     }
 }

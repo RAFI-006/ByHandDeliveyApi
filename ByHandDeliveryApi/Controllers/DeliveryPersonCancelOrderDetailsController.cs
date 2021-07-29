@@ -42,7 +42,6 @@ namespace ByHandDeliveryApi.Controllers
                 {
                     list.Add(_mapper.Map<DeliveryPersonCancelOrderDetailsDTO>(item));
                 }
-
                 response.HasError = false;
                 response.Message = _successMsg;
                 response.Result = list;
@@ -82,8 +81,6 @@ namespace ByHandDeliveryApi.Controllers
                 response.Message = e.Message;
                 response.HasError = false;
             }
-
-
             return response.ToHttpResponse();
         }
 
@@ -96,14 +93,12 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             var tblDeliveryPersonCancelOrderDetails = await _context.TblDeliveryPersonCancelOrderDetails.FindAsync(id);
 
             if (tblDeliveryPersonCancelOrderDetails == null)
             {
                 return NotFound();
             }
-
             return Ok(tblDeliveryPersonCancelOrderDetails);
         }
 
@@ -150,21 +145,17 @@ namespace ByHandDeliveryApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             GenericResponse<string> responses = new GenericResponse<string>();
             try
             {
-
                 var mapppedData = _mapper.Map<TblDeliveryPersonCancelOrderDetails>(data);
                 _context.Add(mapppedData);
                 _context.SaveChanges();
                 var res = _context.TblDeliveryPersonCancelOrderDetails.Where(p => p.DeliveryPersonCancelOrderDetailID == data.DeliveryPersonCancelOrderDetailID).FirstOrDefault();
 
-
                 responses.Result = "Created Successfully";
                 responses.Message = "Successfull";
                 responses.HasError = false;
-
             }
             catch (Exception e)
             {

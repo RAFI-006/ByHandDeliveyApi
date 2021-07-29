@@ -11,9 +11,9 @@ namespace ByHandDeliveryApi.Models
             TblDeliveryPersonCancelOrderDetails = new HashSet<TblDeliveryPersonCancelOrderDetails>();
         }
 
-        public int OrderId { get; set; }
-        public int CustomerId { get; set; }
-        public int? DeliveryPersonId { get; set; }
+        public int OrderID { get; set; }
+        public int CustomerID { get; set; }
+        public int? DeliveryPersonID { get; set; }
         public string PickupLocality { get; set; }
         public string City { get; set; }
         public string MobileNo { get; set; }
@@ -28,12 +28,12 @@ namespace ByHandDeliveryApi.Models
         public string GoodsType { get; set; }
         public int? ParcelValue { get; set; }
         public int? OrderAmount { get; set; }
-        public int? PaymentTypeId { get; set; }
-        public int? OrderStatusId { get; set; }
+        public int? PaymentTypeID { get; set; }
+        public int? OrderStatusID { get; set; }
         public DateTime? CreatedDate { get; set; }
         public decimal? FromLat { get; set; }
         public decimal? FromLong { get; set; }
-        public decimal? Distance { get; set; }
+        
         public string PaymentFrom { get; set; }
         public string ProductImage { get; set; }
         public string PromoCode { get; set; }
