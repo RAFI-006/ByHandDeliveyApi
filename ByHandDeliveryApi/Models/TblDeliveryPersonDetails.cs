@@ -12,7 +12,7 @@ namespace ByHandDeliveryApi.Models
 
         }
         public int DeliveryPersonDetailID { get; set; }
-        public int DeliveryPersonId { get; set; }
+        public int DeliveryPersonID { get; set; }
         public string AadhaarNo { get; set; }
         public string AadhaarFrontImage { get; set; }
         public string AadhaarBackImage { get; set; }

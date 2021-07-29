@@ -91,7 +91,7 @@ namespace ByHandDeliveryApi.Controllers
                         _context.SaveChanges();
                         response.HasError = false;
                         response.Message = _successMsg;
-                        var data = _context.TblCustomers.Where(p => p.CustomerId == tblCustomers.CustomerId).FirstOrDefault();
+                        var data = _context.TblCustomers.Where(p => p.CustomerID == tblCustomers.CustomerID).FirstOrDefault();
                         response.Result = _mapper.Map<CustomersDto>(data);
                     }
                     
@@ -228,7 +228,7 @@ namespace ByHandDeliveryApi.Controllers
             GenericResponse<CustomersDto> response = new GenericResponse<CustomersDto>();
             try
             { 
-            if (TblCustomersExists(tblCustomers.CustomerId))
+            if (TblCustomersExists(tblCustomers.CustomerID))
             {
                 _context.Update(_mapper.Map<TblCustomers>(tblCustomers));
                 _context.SaveChanges();
@@ -318,7 +318,7 @@ namespace ByHandDeliveryApi.Controllers
 
         private bool TblCustomersExists(int id)
         {
-            return _context.TblCustomers.Any(e => e.CustomerId == id);
+            return _context.TblCustomers.Any(e => e.CustomerID == id);
         }
 
         private bool TblCustomersExists(string phoneNumber)

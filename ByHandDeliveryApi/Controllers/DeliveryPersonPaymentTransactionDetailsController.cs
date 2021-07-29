@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Data;
+using AutoMapper;
+using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +22,7 @@ namespace ByHandDeliveryApi.Controllers
         private readonly db_byhanddeliveryContext _context;
         private readonly IMapper _mapper;
         private readonly string _successMsg = "Sucessfully Completed";
-
+        private readonly string ConnectionString = Startup.ConnectionString;
         public DeliveryPersonPaymentTransactionDetailsController(db_byhanddeliveryContext context, IMapper mapper)
         {
             _context = context;
@@ -59,24 +62,42 @@ namespace ByHandDeliveryApi.Controllers
 
 
 
-        [HttpGet("GetTransactionDetailById")]
-        public IActionResult GetTransactionDetailById(int id)
+        [HttpGet("DeliveryPersonPaymentTransactionDetails")]
+        public IActionResult DeliveryPersonPaymentTransactionDetails (int DeliveryPersonID, DateTime FromTransactionDate, DateTime ToTransactionDate)
         {
 
-            var response = new GenericResponse<List<DeliveryPersonPaymentTransactionDetailsDTO>>();
+            DataTable dt = new DataTable();
+            var response = new GenericResponse<DataTable>();
 
             try
             {
-                var data = _context.TblDeliveryPersonPaymentTransactionDetails.Where(p=>p.DeliveryPersonID == id).ToList();
-                var list = new List<DeliveryPersonPaymentTransactionDetailsDTO>();
-                foreach (var item in data)
+                if ((FromTransactionDate.ToShortDateString() == "01/01/0001") || (FromTransactionDate.ToShortDateString().Trim() == "1/1/0001"))
                 {
-                    list.Add(_mapper.Map<DeliveryPersonPaymentTransactionDetailsDTO>(item));
+                    FromTransactionDate = Convert.ToDateTime("01/01/1800");
                 }
-
+                if ((ToTransactionDate.ToShortDateString() == "01/01/0001") || (ToTransactionDate.ToShortDateString().Trim() == "1/1/0001"))
+                {
+                    ToTransactionDate = Convert.ToDateTime("01/01/1800");
+                }
+                using (SqlConnection sql = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("prDeliveryPersonPaymentTransactionDetails", sql))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", DeliveryPersonID));
+                        cmd.Parameters.Add(new SqlParameter("@FromTransactionDate", FromTransactionDate));
+                        cmd.Parameters.Add(new SqlParameter("@ToTransactionDate", ToTransactionDate));
+                        sql.Open();
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(dt);
+                        sql.Close();
+                        response.HasError = false;
+                        response.Message = "Get Records Successfully";
+                    }
+                }
                 response.HasError = false;
                 response.Message = _successMsg;
-                response.Result = list;
+                response.Result = dt;
             }
             catch (Exception e)
             {
@@ -153,28 +174,38 @@ namespace ByHandDeliveryApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            GenericResponse<string> responses = new GenericResponse<string>();
+            GenericResponse<string> response  = new GenericResponse<string>();
             try
             {
+                //var mapppedData = _mapper.Map<TblDeliveryPersonPaymentTransactionDetails>(data);
+                //_context.Add(mapppedData);
+                //_context.SaveChanges();
+                //var res = _context.TblDeliveryPersonPaymentTransactionDetails.Where(p => p.DeliveryPersonAccountDetailID == data.DeliveryPersonAccountDetailID).FirstOrDefault();
 
-                var mapppedData = _mapper.Map<TblDeliveryPersonPaymentTransactionDetails>(data);
-                _context.Add(mapppedData);
-                _context.SaveChanges();
-                var res = _context.TblDeliveryPersonPaymentTransactionDetails.Where(p => p.DeliveryPersonAccountDetailID == data.DeliveryPersonAccountDetailID).FirstOrDefault();
-
-
-                responses.Result = "Created Successfully";
-                responses.Message = "Successfull";
-                responses.HasError = false;
-
+                using (SqlConnection sql = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("prInsertDeliveryPersonPaymentTransaction", sql))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", data.DeliveryPersonID));
+                        cmd.Parameters.Add(new SqlParameter("@Amount", data.Amount));
+                        cmd.Parameters.Add(new SqlParameter("@PaymentType", data.PaymentType));
+                        cmd.Parameters.Add(new SqlParameter("@CrDr", data.CrDr));
+                        cmd.Parameters.Add(new SqlParameter("@Comment", data.Comment ));
+                        sql.Open();
+                        cmd.ExecuteNonQuery();
+                        response.Result = "Created Successfully";
+                        response.Message = "Successfull";
+                        response.HasError = false;
+                    }
+                }
             }
             catch (Exception e)
             {
-                responses.Message = e.Message;
-                responses.HasError = true;
+                response.Message = e.Message;
+                response.HasError = true;
             }
-
-            return responses.ToHttpResponse();
+            return response.ToHttpResponse();
         }
 
         // DELETE: api/DeliveryPersonPaymentTransactionDetails/5

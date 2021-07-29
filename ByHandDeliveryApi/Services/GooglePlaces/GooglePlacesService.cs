@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace ByHandDeliveryApi.Services.GooglePlaces
 {
-  public  class GooglePlacesService 
-     {
-       
-      //  private const string GMapsApiKey = "AIzaSyBABRX-a5a8HMXfZiW5NSJFhcEsARd88sM";
+    public class GooglePlacesService
+    {
+
+        //  private const string GMapsApiKey = "AIzaSyBABRX-a5a8HMXfZiW5NSJFhcEsARd88sM";
         private const string GMapsApiKey = "AIzaSyCSFVDxQd3XRlWZ0l4KUcS8BoJyPzzpg7w";
         private const string PLACE_DETAIL_END_POINT = "/maps/api/place/details/json";
         private const string AUTOCOMPLETE_END_POINT = "/maps/api/place/autocomplete/json";
@@ -21,12 +21,12 @@ namespace ByHandDeliveryApi.Services.GooglePlaces
 
         public GooglePlacesService()
         {
-            
+
         }
         public async Task<PlacesAutoCompleteResponse> GetAutoCompleteGooglePlaces(string input)
         {
-            
-            var uri = new Uri(string.Format(CreateAutoCompleteApiRequest(input,"en"), string.Empty));
+
+            var uri = new Uri(string.Format(CreateAutoCompleteApiRequest(input, "en"), string.Empty));
 
             var response = await RequestProviderService.GetAsync<PlacesAutoCompleteResponse>(uri);
 
@@ -47,7 +47,7 @@ namespace ByHandDeliveryApi.Services.GooglePlaces
 
         public async Task<DistanceMatrixResponse> GetDistanceMatrix(string src, String dest)
         {
-            var uri = new Uri(string.Format(CreateDistanceMatrixApiRequest(src,dest), string.Empty));
+            var uri = new Uri(string.Format(CreateDistanceMatrixApiRequest(src, dest), string.Empty));
 
             var response = await RequestProviderService.GetAsync<DistanceMatrixResponse>(uri);
 
@@ -57,9 +57,9 @@ namespace ByHandDeliveryApi.Services.GooglePlaces
         }
 
 
-        public string CreateAutoCompleteApiRequest(string place,string lang)
+        public string CreateAutoCompleteApiRequest(string place, string lang)
         {
-            var placesRequest = new AuthorizeRequest(GooglePlacesBaseUrl+ AUTOCOMPLETE_END_POINT);
+            var placesRequest = new AuthorizeRequest(GooglePlacesBaseUrl + AUTOCOMPLETE_END_POINT);
             var dic = new Dictionary<string, string>();
             dic.Add("input", place);
             dic.Add("language", lang);
@@ -78,7 +78,7 @@ namespace ByHandDeliveryApi.Services.GooglePlaces
             return placesUri;
         }
 
-        public string CreateDistanceMatrixApiRequest(string origin ,string des)
+        public string CreateDistanceMatrixApiRequest(string origin, string des)
         {
             var placesRequest = new AuthorizeRequest(GooglePlacesBaseUrl + DISTANCEMATRIX_END_POINT);
             var dic = new Dictionary<string, string>();

@@ -7,8 +7,8 @@ namespace ByHandDeliveryApi.DTO
 {
     public class OrderDeliveryAddDto
     {
-        public int OrderDeliveryAddressId { get; set; }
-        public int OrderId { get; set; }
+        public int OrderDeliveryAddressID { get; set; }
+        public int OrderID { get; set; }
         public string DropLocality { get; set; }
         public string MobileNo { get; set; }
         public DateTime? DeliveryFromTime { get; set; }
@@ -19,10 +19,8 @@ namespace ByHandDeliveryApi.DTO
         public string Action { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
+        public decimal? ApproxDistance { get; set; }
+        public TimeSpan? ApproxTime { get; set; }
         public string ProductImage { get; set; }
-        public DateTime? CreatedDate { get; set; }
-
-
-
     }
 }
