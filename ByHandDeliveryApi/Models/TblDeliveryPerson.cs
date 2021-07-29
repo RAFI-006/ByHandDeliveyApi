@@ -13,7 +13,7 @@ namespace ByHandDeliveryApi.Models
             TblDeliveryPersonCancelOrderDetails = new HashSet<TblDeliveryPersonCancelOrderDetails>();
         }
 
-        public int DeliveryPersonID { get; set; }
+        public int DeliveryPersonId { get; set; }
         public string PersonName { get; set; }
         public string MobileNo { get; set; }
         public string AlternateNo { get; set; }

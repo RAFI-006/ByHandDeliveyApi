@@ -8,7 +8,7 @@ namespace ByHandDeliveryApi.DTO
     public class DeliveryPersonDetailDto
     {
         public int DeliveryPersonDetailID { get; set; }
-        public int DeliveryPersonID { get; set; }
+        public int DeliveryPersonId { get; set; }
         public string AadhaarNo { get; set; }
         public string AadhaarFrontImage { get; set; }
         public string AadhaarBackImage { get; set; }

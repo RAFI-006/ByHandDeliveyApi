@@ -7,8 +7,8 @@ namespace ByHandDeliveryApi.DTO
 {
     public class DDValueDTO
     {
-        public int DdvalueID { get; set; }
-        public int? DropDownID { get; set; }
+        public int DdvalueId { get; set; }
+        public int? DropDownId { get; set; }
         public string Ddkey { get; set; }
         public string Ddvalue { get; set; }
         public int? SortOrderNo { get; set; }

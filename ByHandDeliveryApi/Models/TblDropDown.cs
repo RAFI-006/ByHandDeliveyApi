@@ -10,7 +10,7 @@ namespace ByHandDeliveryApi.Models
             TblDdvalues = new HashSet<TblDdvalues>();
         }
 
-        public int DropDownID { get; set; }
+        public int DropDownId { get; set; }
         public string Ddname { get; set; }
         public string DropDownKey { get; set; }
         public bool? IsActive { get; set; }

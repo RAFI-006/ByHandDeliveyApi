@@ -84,11 +84,11 @@ namespace ByHandDeliveryApi.Controllers
             GenericResponse<OrderDeliveryAddDto> response = new GenericResponse<OrderDeliveryAddDto>();
             try
             {
-                if (TblOrderDeliveryAddressExists(tblOrderDeliveryAddress.OrderDeliveryAddressID))
+                if (TblOrderDeliveryAddressExists(tblOrderDeliveryAddress.OrderDeliveryAddressId))
                 {
                     _context.Update(_mapper.Map<TblOrderDeliveryAddress>(tblOrderDeliveryAddress));
                     _context.SaveChanges();
-                    var res = _context.TblOrderDeliveryAddress.Where(p => p.OrderDeliveryAddressID == tblOrderDeliveryAddress.OrderDeliveryAddressID).FirstOrDefault();
+                    var res = _context.TblOrderDeliveryAddress.Where(p => p.OrderDeliveryAddressId == tblOrderDeliveryAddress.OrderDeliveryAddressId).FirstOrDefault();
                     response.Result = _mapper.Map<OrderDeliveryAddDto>(res);
                     response.Message = "Successfull";
                     response.HasError = false;
@@ -130,7 +130,7 @@ namespace ByHandDeliveryApi.Controllers
                     var mapppedData = _mapper.Map<TblOrderDeliveryAddress>(data);
                     _context.Add(mapppedData);
                     _context.SaveChanges();
-                    var res = _context.TblOrderDeliveryAddress.Where(p => p.OrderDeliveryAddressID == data.OrderDeliveryAddressID).FirstOrDefault();
+                    var res = _context.TblOrderDeliveryAddress.Where(p => p.OrderDeliveryAddressId == data.OrderDeliveryAddressId).FirstOrDefault();
                     
 
                     responses.Result = "Created Successfully";
@@ -170,7 +170,7 @@ namespace ByHandDeliveryApi.Controllers
 
         private bool TblOrderDeliveryAddressExists(int id)
         {
-            return _context.TblOrderDeliveryAddress.Any(e => e.OrderDeliveryAddressID == id);
+            return _context.TblOrderDeliveryAddress.Any(e => e.OrderDeliveryAddressId == id);
         }
     }
 }

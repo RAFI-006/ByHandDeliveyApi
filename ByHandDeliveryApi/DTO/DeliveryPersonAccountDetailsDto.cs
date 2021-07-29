@@ -8,8 +8,8 @@ namespace ByHandDeliveryApi.DTO
     public class DeliveryPersonAccountDetailsDto
     {
 
-        public int DeliveryPersonAccountDetailID { get; set; }
-        public int DeliveryPersonID { get; set; }
+        public int DeliveryPersonAccountDetailId { get; set; }
+        public int DeliveryPersonId { get; set; }
         public int Amount { get; set; }
         public string PaymentType { get; set; }
         public string CrDr { get; set; }

@@ -108,7 +108,7 @@ namespace ByHandDeliveryApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != tblDeliveryCity.DeliveryCityID)
+            if (id != tblDeliveryCity.DeliveryCityId)
             {
                 return BadRequest();
             }
@@ -144,7 +144,7 @@ namespace ByHandDeliveryApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            switch (ImageType.ToLower().Trim())
+            switch (ImageType.ToLower())
             {
                 case "profile":
                     ImagePath = ProfileImagePath.ProfilesImagePath;
@@ -154,9 +154,6 @@ namespace ByHandDeliveryApi.Controllers
                     break;
                 case "document":
                     ImagePath = DocumentImagePath.DocumentsImagePath;
-                    break;
-                default:
-                    response.Message = "Invalid Image Type Name";
                     break;
             }
 
@@ -199,6 +196,7 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
+
                 var data = _context.TblDropDown.ToList();
 
                 foreach (var item in data)
@@ -241,6 +239,7 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
+
                 var data = _context.TblDropDown.Include(p => p.TblDdvalues).Where(t=>t.DropDownKey == ConfigKey).FirstOrDefault();
             
                 if (data!=null)
@@ -284,6 +283,9 @@ namespace ByHandDeliveryApi.Controllers
             {
                 string accountSid = "AC07f7179f1b520b541532521565d1965c";
                 string authToken = "675f83ea588c2a055fb30114656e982a";
+
+
+
 
                 TwilioClient.Init(accountSid, authToken);
 
@@ -373,13 +375,15 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
-                PlacesDetailResponse result = await _googleService.GetPlaceDetail(placeId);
+
+              PlacesDetailResponse result = await _googleService.GetPlaceDetail(placeId);
 
                 if (result.status == "OK")
                 {
                     response.HasError = false;
                     response.Message = _successMsg;
-                    response.Result = new PlaceDetailData {
+               
+                      response.Result = new PlaceDetailData {
                         FormattedAddress = result.result.formatted_address,
                         Geometry =  result.result.geometry
 
@@ -408,7 +412,7 @@ namespace ByHandDeliveryApi.Controllers
         [HttpPost("GetDistanceBetweenTwoPoints")]
         public async Task<IActionResult> GetDistanceBetweenTwoPoints([FromBody] LocationRequestModel model)
         {
-            GenericResponse<string> response = new GenericResponse<string>();
+            GenericResponse<DistanceMatrixResponse> response = new GenericResponse<DistanceMatrixResponse>();
 
             if (!ModelState.IsValid)
             {
@@ -417,15 +421,16 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
+                string source = model.SourceLat.ToString() + "," + model.SourceLong.ToString();
+                string des = model.DestLat.ToString() + "," + model.DestLong.ToString();
 
-
-                var result = GetDistanceFromLatLonInKm(model.SourceLat, model.SourceLong, model.DestLat, model.DestLong);
+                DistanceMatrixResponse result = await _googleService.GetDistanceMatrix(source,des);
 
                 if (result!=null)
                 {
                     response.HasError = false;
                     response.Message = _successMsg;
-                    response.Result = result.ToString();
+                    response.Result = result;
 
                 }
                 else
@@ -501,7 +506,7 @@ namespace ByHandDeliveryApi.Controllers
             _context.TblDeliveryCity.Add(tblDeliveryCity);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTblDeliveryCity", new { id = tblDeliveryCity.DeliveryCityID }, tblDeliveryCity);
+            return CreatedAtAction("GetTblDeliveryCity", new { id = tblDeliveryCity.DeliveryCityId }, tblDeliveryCity);
         }
 
         // DELETE: api/DeliveryCities/5
@@ -527,7 +532,7 @@ namespace ByHandDeliveryApi.Controllers
 
         private bool TblDeliveryCityExists(int id)
         {
-            return _context.TblDeliveryCity.Any(e => e.DeliveryCityID == id);
+            return _context.TblDeliveryCity.Any(e => e.DeliveryCityId == id);
         }
 
 
@@ -543,48 +548,6 @@ namespace ByHandDeliveryApi.Controllers
               ;
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             var d = R * c; // Distance in km
-           if (d > 1 & d <= 3)
-            {
-                d = d + 1;
-            }
-           else if (d > 3 & d<=6)
-            {
-                d = d + 2;
-            }
-            else if(d > 6 & d <= 10)
-            {
-                d = d + 3;
-            }
-
-            else if (d > 10 & d <= 15)
-            {
-                d = d + 4;
-            }
-            else if (d > 15 & d <= 25)
-            {
-                d = d + 5;
-            }
-            else if (d>25 & d<=35)
-            {
-                d = d + 6;
-            }
-            else if (d > 35 & d <= 45)
-            {
-                d = d + 7;
-            }
-            else if (d > 45 & d <= 60)
-            {
-                d = d + 8;
-            }
-            else if (d > 60 & d <= 70)
-            {
-                d = d + 9;
-            }
-            else if (d > 70 & d <= 80)
-            {
-                d = d + 10;
-            }
-           
             return d;
         }
 

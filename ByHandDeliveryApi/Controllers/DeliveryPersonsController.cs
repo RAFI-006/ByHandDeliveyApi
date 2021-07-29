@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -101,41 +100,35 @@ namespace ByHandDeliveryApi.Controllers
 
 
 
-        [HttpGet("DeliveryPersonOrderTransactionDetails")]
-        public IActionResult DeliveryPersonOrderTransactionDetails(int DeliveryPersonID, DateTime FromOrderDate, DateTime ToOrderDate)
+        [HttpGet("OrderTransactionDetails")]
+        public IActionResult GetOrderTransactionDetails(int id)
         {
-            DataTable dt = new DataTable();
-            var response = new GenericResponse<DataTable>();
+            var response = new GenericResponse<List<TransactionDetailModel>>();
 
             try
             {
-                if ((FromOrderDate.ToShortDateString() == "01/01/0001") || (FromOrderDate.ToShortDateString().Trim() == "1/1/0001"))
+                var data = _context.TblDeliveryPerson.Where(p=>p.DeliveryPersonId == id).Include(p=>p.TblOrders).Include(p=>p.TblDeliveryPersonCancelOrderDetails).Include(p => p.TblDeliveryPersonPaymentTransactionDetails).FirstOrDefault();
+                var list = new List<TransactionDetailModel>();
+                foreach (var item in data.TblOrders)
                 {
-                    FromOrderDate = Convert.ToDateTime("01/01/1800");
-                }
-                if ((ToOrderDate.ToShortDateString() == "01/01/0001") || (ToOrderDate.ToShortDateString().Trim() == "1/1/0001"))
-                {
-                    ToOrderDate = Convert.ToDateTime("01/01/1800");
-                }
-                using (SqlConnection sql = new SqlConnection(ConnectionString))
-                {
-                    using (SqlCommand cmd = new SqlCommand("prDeliveryPersonOrderTransactionDetails", sql))
+                    if(item.OrderStatusId ==12)
+                    list.Add(new TransactionDetailModel
                     {
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", DeliveryPersonID));
-                        cmd.Parameters.Add(new SqlParameter("@FromOrderDate", FromOrderDate));
-                        cmd.Parameters.Add(new SqlParameter("@ToOrderDate", ToOrderDate));
-                        sql.Open();
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dt);
-                        sql.Close();
-                        response.HasError = false;
-                        response.Message = "Get Records Successfully";
-                    }
-                }
+                        OrderId = item.OrderId,
+                        Date =item.CreatedDate,
+                        TotalAmount = item.OrderAmount,
+                        CommisionFee = item.CommissionFee,
+                        DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
+                        PaymentType = item.PaymentTypeId == 6? "Cash" : "Online",
+                        PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
+
+
+                    });
+            }
+
                 response.HasError = false;
                 response.Message = _successMsg;
-                response.Result = dt;
+                response.Result = list;
             }
             catch (Exception e)
             {
@@ -143,45 +136,74 @@ namespace ByHandDeliveryApi.Controllers
                 response.HasError = false;
             }
 
+
             return response.ToHttpResponse();
         }
 
 
-        [HttpGet("DeliveryPersonLedgerSummary")]
-        public IActionResult DeliveryPersonLedgerSummary(int DeliveryPersonID, DateTime FromOrderDate, DateTime ToOrderDate)
+        [HttpGet("TotalChargesDetails")]
+        public IActionResult TotalChargesDetails(int id)
         {
-            DataTable dt = new DataTable();
-            var response = new GenericResponse<DataTable>();
+            var response = new GenericResponse<LiesureModel>();
+            LiesureModel calData =  new LiesureModel {
+                DeliveryPersonCharges =0,
+                CashReceivedFromOrder =0,
+                AmountRecievedByCompany =0,
+                CancellationFee =0,
+                AmountPaidToCompany =0,
+                BalanceAmount =0
+
+
+            };
             try
             {
-                if ((FromOrderDate.ToShortDateString() == "01/01/0001") || (FromOrderDate.ToShortDateString().Trim() == "1/1/0001"))
+                var data = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == id).Include(p => p.TblOrders).Include(p => p.TblDeliveryPersonCancelOrderDetails).Include(p => p.TblDeliveryPersonPaymentTransactionDetails).FirstOrDefault();
+                var list = new List<TransactionDetailModel>();
+                foreach (var item in data.TblOrders)
                 {
-                    FromOrderDate = Convert.ToDateTime("01/01/1800");
+                    if (item.OrderStatusId == 12)
+                        list.Add(new TransactionDetailModel
+                        {
+                            OrderId = item.OrderId,
+                            Date = item.CreatedDate,
+                            TotalAmount = item.OrderAmount,
+                            CommisionFee = item.CommissionFee,
+                            DeliveyPersonCharge = item.OrderAmount - item.CommissionFee,
+                            PaymentType = item.PaymentTypeId == 6 ? "Cash" : "Online",
+                            PaymentRecievedTo = item.PaymentTypeId == 6 ? "Self" : "Company"
+                     });
                 }
-                if ((ToOrderDate.ToShortDateString() == "01/01/0001") || (ToOrderDate.ToShortDateString().Trim() == "1/1/0001"))
+
+                //data from orderTabe
+                foreach (var item in list)
                 {
-                    ToOrderDate = Convert.ToDateTime("01/01/1800");
+                    calData.DeliveryPersonCharges = calData.DeliveryPersonCharges + item.DeliveyPersonCharge;
+
+                    if (item.PaymentType == "Cash")
+                        calData.CashReceivedFromOrder = calData.CashReceivedFromOrder + item.TotalAmount;
                 }
-                using (SqlConnection sql = new SqlConnection(ConnectionString))
+
+            
+                //for Payment Transaction Calculation
+                foreach (var item in data.TblDeliveryPersonPaymentTransactionDetails)
                 {
-                    using (SqlCommand cmd = new SqlCommand("prDeliveryPersonLedgerSummary", sql))
-                    {
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", DeliveryPersonID));
-                        cmd.Parameters.Add(new SqlParameter("@FromOrderDate", FromOrderDate));
-                        cmd.Parameters.Add(new SqlParameter("@ToOrderDate", ToOrderDate));
-                        sql.Open();
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dt);
-                        sql.Close();
-                        response.HasError = false;
-                        response.Message = "Get Records Successfully";
-                    }
+                    if (item.CrDr == "Credit")
+                        calData.AmountRecievedByCompany = calData.AmountRecievedByCompany + item.Amount;
+                    else if(item.CrDr == "Debit")
+
+                        calData.AmountPaidToCompany = calData.AmountPaidToCompany + item.Amount;
                 }
+
+                foreach(var item in data.TblDeliveryPersonCancelOrderDetails)
+                {
+                    calData.CancellationFee = calData.CancellationFee + item.CancellationFee;
+                }
+                calData.BalanceAmount = (calData.DeliveryPersonCharges + calData.AmountPaidToCompany) - (Convert.ToDecimal(calData.CashReceivedFromOrder) + calData.AmountRecievedByCompany + calData.CancellationFee);
+
                 response.HasError = false;
                 response.Message = _successMsg;
-                response.Result = dt;
-
+                response.Result = calData;
+               
             }
             catch (Exception e)
             {
@@ -302,7 +324,7 @@ namespace ByHandDeliveryApi.Controllers
             GenericResponse<DeliveryPersonDto> response = new GenericResponse<DeliveryPersonDto>();
             try
             {
-                if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonID))
+                if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonId))
                 {
                 
                     _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
@@ -331,7 +353,7 @@ namespace ByHandDeliveryApi.Controllers
 
         // PUT: api/DeliveryPersonKYCDetails/5
         [HttpPut ("UpdateDeliveryPersonKYCDetails")]
-        public async Task<IActionResult> UpdateDeliveryPersonKYCDetails ([FromBody] DeliveryPersonDetailDto data)
+        public async Task<IActionResult>UpdateDeliveryPersonKYCDetails([FromBody] DeliveryPersonDetailDto data)
         {
             if (!ModelState.IsValid)
             {
@@ -341,7 +363,7 @@ namespace ByHandDeliveryApi.Controllers
             GenericResponse<DeliveryPersonDetailDto> response = new GenericResponse<DeliveryPersonDetailDto>();
             try
             {
-                if (TblDeliveryPersonDetailExists(data.DeliveryPersonID))
+                if (TblDeliveryPersonDetailExists(data.DeliveryPersonId))
                 {
 
                     using (SqlConnection sql = new SqlConnection(ConnectionString))
@@ -349,7 +371,7 @@ namespace ByHandDeliveryApi.Controllers
                         using (SqlCommand cmd = new SqlCommand("prUpdateDeliveryPersonKYCInfo", sql))
                         {
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                            cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", data.DeliveryPersonID));
+                            cmd.Parameters.Add(new SqlParameter("@DeliveryPersonID", data.DeliveryPersonId));
                             cmd.Parameters.Add(new SqlParameter("@AadhaarNo", data.AadhaarNo));
                             cmd.Parameters.Add(new SqlParameter("@AadhaarFrontImage", data.AadhaarFrontImage));
                             cmd.Parameters.Add(new SqlParameter("@AadhaarBackImage", data.AadhaarBackImage));
@@ -372,7 +394,7 @@ namespace ByHandDeliveryApi.Controllers
                             sql.Open();
                             cmd.ExecuteNonQuery();
                             sql.Close();
-                            var res = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonID == data.DeliveryPersonID).FirstOrDefault();
+                            var res = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonId == data.DeliveryPersonId).FirstOrDefault();
                             response.Result = _mapper.Map<DeliveryPersonDetailDto>(res);
                             response.Message = "Successfull";
                             response.HasError = false;
@@ -429,7 +451,7 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
-                var data = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonID == id).First();
+                var data = _context.TblDeliveryPersonDetails.Where(p => p.DeliveryPersonId == id).First();
 
                 response.HasError = false;
                 response.Message = _successMsg;
@@ -517,11 +539,11 @@ namespace ByHandDeliveryApi.Controllers
             {
                 if (TblDeliveryPersonExists(deliveryBoyId))
                 {
-                    var user = _context.TblDeliveryPerson.Where((p) => p.DeliveryPersonID == deliveryBoyId).FirstOrDefault();
+                    var user = _context.TblDeliveryPerson.Where((p) => p.DeliveryPersonId == deliveryBoyId).FirstOrDefault();
                     user.IsVerified = isVerified;
                     _context.Update(_mapper.Map<TblDeliveryPerson>(user));
                     _context.SaveChanges();
-                    var res = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonID == deliveryBoyId).FirstOrDefault();
+                    var res = _context.TblDeliveryPerson.Where(p => p.DeliveryPersonId == deliveryBoyId).FirstOrDefault();
 
                     if (res.IsVerified == true)
                     {
@@ -601,8 +623,8 @@ namespace ByHandDeliveryApi.Controllers
                             cmd.Parameters.Add(new SqlParameter("@BankName", data.BankName ));
                             cmd.Parameters.Add(new SqlParameter("@IFSC", data.Ifsc));
                             cmd.Parameters.Add(new SqlParameter("@CanceledChequeImage", data.CanceledChequeImage));
-                            sql.Open();
-                            cmd.ExecuteNonQuery();
+                            sql.OpenAsync();
+                            cmd.ExecuteNonQueryAsync();
                             var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == data.MobileNo).FirstOrDefault();
                             responses.Result = _mapper.Map<DeliveryPersonDto>(res);
                             responses.Message = "Successfull";
@@ -625,40 +647,7 @@ namespace ByHandDeliveryApi.Controllers
         }
 
 
-
-
-        [HttpGet("IsValidPromocode")]
-        public  IActionResult IsValidPromocode(string Promocode)
-        {
-         
-            GenericResponse<bool> response  = new GenericResponse<bool>();
-            try
-            {
-                using (SqlConnection sql = new SqlConnection(ConnectionString))
-                {
-
-
-                    using (SqlCommand cmd = new SqlCommand("prValidatePromocode", sql))
-                    {
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter("@PromoCode", Promocode));
-                        sql.Open();
-                        cmd.ExecuteNonQuery();
-                        response.HasError = false;
-                        response.Result = true;
-                        response.Message = "Valid Promocode";
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                response.HasError = false;
-                response.Message = e.Message; 
-
-            }
-
-            return response.ToHttpResponse();
-        }
+       
 
         [HttpGet("IsNumberRegistered")]
         public IActionResult IsUserRegisered(string number)
@@ -708,7 +697,7 @@ namespace ByHandDeliveryApi.Controllers
 
         private bool TblDeliveryPersonExists(int id)
         {
-            return _context.TblDeliveryPerson.Any(e => e.DeliveryPersonID == id);
+            return _context.TblDeliveryPerson.Any(e => e.DeliveryPersonId == id);
         }
 
         private bool TblDeliveryPersonExists(string mobile)
@@ -717,7 +706,7 @@ namespace ByHandDeliveryApi.Controllers
         }
         private bool TblDeliveryPersonDetailExists(int id)
         {
-            return _context.TblDeliveryPersonDetails.Any(e => e.DeliveryPersonID == id);
+            return _context.TblDeliveryPersonDetails.Any(e => e.DeliveryPersonId == id);
         }
     }
 }
