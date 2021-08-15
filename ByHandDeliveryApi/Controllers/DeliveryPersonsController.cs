@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using ByHandDeliveryApi.Services;
 using System.Web.Http.Cors;
 using ByHandDeliveryApi.DataModel;
+using ByHandDeliveryApi.Security;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -246,7 +247,8 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<DeliveryPersonDto>();
             try
             {
-                var tblDeliveryBoy = _context.TblDeliveryPerson.Where(p => p.MobileNo == phone && p.Password == pass).FirstOrDefault();
+                //var tblDeliveryBoy = _context.TblDeliveryPerson.Where(p => p.MobileNo == phone && PasswordHasher.VerifyPassword(pass,p.Password)).FirstOrDefault();
+                  var tblDeliveryBoy = _context.TblDeliveryPerson.Where(p => p.MobileNo == phone && p.Password == pass).FirstOrDefault();
 
                 if (tblDeliveryBoy == null)
                 {
@@ -304,7 +306,7 @@ namespace ByHandDeliveryApi.Controllers
             {
                 if (TblDeliveryPersonExists(tblDeliveryPerson.DeliveryPersonID))
                 {
-                
+             //        tblDeliveryPerson.Password = PasswordHasher.CreateHash(tblDeliveryPerson.Password);
                     _context.Update(_mapper.Map<TblDeliveryPerson>(tblDeliveryPerson));
                     _context.SaveChanges();
                     var res = _context.TblDeliveryPerson.Where(p => p.MobileNo == tblDeliveryPerson.MobileNo).FirstOrDefault();
@@ -567,6 +569,7 @@ namespace ByHandDeliveryApi.Controllers
                 {
                     using (SqlConnection sql = new SqlConnection(ConnectionString))
                     {
+                      //  data.Password = PasswordHasher.CreateHash(data.Password);
                         using (SqlCommand cmd = new SqlCommand("prInsertDeliveryPerson", sql))
                         {
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;

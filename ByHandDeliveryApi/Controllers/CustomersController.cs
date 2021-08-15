@@ -10,6 +10,7 @@ using ByHandDeliveryApi.DTO;
 using ByHandDeliveryApi.GenericResponses;
 using AutoMapper;
 using System.Web.Http.Cors;
+using ByHandDeliveryApi.Security;
 
 namespace ByHandDeliveryApi.Controllers
 {
@@ -68,7 +69,7 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<CustomersDto>();
             try
             {
-                var tblCustomers =  _context.TblCustomers.Where(p=>p.MobileNo==phone && p.Password== pass).FirstOrDefault();
+                var tblCustomers =  _context.TblCustomers.Where(p=>p.MobileNo==phone && PasswordHasher.VerifyPassword(pass,p.Password)).FirstOrDefault();
 
                 if (tblCustomers == null)
                 {
@@ -230,6 +231,7 @@ namespace ByHandDeliveryApi.Controllers
             { 
             if (TblCustomersExists(tblCustomers.CustomerID))
             {
+                tblCustomers.Password = PasswordHasher.CreateHash(tblCustomers.Password);          
                 _context.Update(_mapper.Map<TblCustomers>(tblCustomers));
                 _context.SaveChanges();
                     var res = _context.TblCustomers.Where(p => p.MobileNo == tblCustomers.MobileNo).FirstOrDefault();
@@ -272,6 +274,7 @@ namespace ByHandDeliveryApi.Controllers
             {
                 if (!TblCustomersExists(data.MobileNo))
                 {
+                     data.Password = PasswordHasher.CreateHash(data.Password);
                     _context.Add(_mapper.Map<TblCustomers>(data));
                     _context.SaveChanges();
                     var res = _context.TblCustomers.Where(p=>p.MobileNo == data.MobileNo).FirstOrDefault();

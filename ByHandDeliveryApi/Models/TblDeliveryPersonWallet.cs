@@ -9,7 +9,7 @@ namespace ByHandDeliveryApi.Models
     {
         public int DeliveryPersonWalletID { get; set; }
         public int DeliveryPersonID { get; set; }
-        public int Wallet { get; set; }
+        public decimal Wallet { get; set; }
         public TblDeliveryPerson DeliveryPerson { get; set; }
     }
 }

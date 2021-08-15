@@ -228,8 +228,16 @@ namespace ByHandDeliveryApi.Controllers
             var response = new GenericResponse<int>();
             try
             {
+                string strApproxTime =  tblOrders.OrderDeliveryAdd.ApproxTime.ToString();
+               // string xmlApproxTime = "< ApproxTime > 00:45:00 </ ApproxTime >";
+                   tblOrders.OrderDeliveryAdd.ApproxTime = TimeSpan.Parse(strApproxTime);
                 string strOrderXML = ToXML(tblOrders);
                 string strDeliveryAddressXML = ToXML(tblOrders.OrderDeliveryAdd);
+                // ApproxTime is not properly generate in xml format, so I have done it manually.
+                XmlDocument xDoc = new XmlDocument();
+                xDoc.LoadXml(strDeliveryAddressXML); 
+                xDoc.DocumentElement.SelectSingleNode("ApproxTime").InnerText  = strApproxTime;
+                strDeliveryAddressXML = xDoc.InnerXml;
 
                 using (SqlConnection sql = new SqlConnection(ConnectionString))
                 {
@@ -289,6 +297,7 @@ namespace ByHandDeliveryApi.Controllers
         public async Task<IActionResult> EditTblOrders([FromBody] OrderRequest tblOrders)
         {
             string DeliveryPersonFcmToken = "                                                                                                                                                      ";
+            string strApproxTime = tblOrders.OrderDeliveryAdd.ApproxTime.ToString();
 
             if (!ModelState.IsValid)
             {
@@ -300,6 +309,12 @@ namespace ByHandDeliveryApi.Controllers
             {
                 string strOrderXML = ToXML(tblOrders);
                 string strDeliveryAddressXML = ToXML(tblOrders.OrderDeliveryAdd);
+
+                // ApproxTime is not properly generate in xml format, so I have done it manually.
+                XmlDocument xDoc = new XmlDocument();
+                xDoc.LoadXml(strDeliveryAddressXML);
+                xDoc.DocumentElement.SelectSingleNode("ApproxTime").InnerText = strApproxTime;
+                strDeliveryAddressXML = xDoc.InnerXml;
 
                 using (SqlConnection sql = new SqlConnection(ConnectionString))
                 {
@@ -562,11 +577,11 @@ namespace ByHandDeliveryApi.Controllers
 
             try
             {
-                if ((FromOrderDate.ToShortDateString() == "01/01/0001") || (FromOrderDate.ToShortDateString().Trim() == "1/1/0001"))
+                if ((FromOrderDate.ToShortDateString() == "01/01/0001") || (FromOrderDate.ToShortDateString().Trim() == "1/1/0001") || (FromOrderDate.ToShortDateString().Trim() == "1/1/1753") || (FromOrderDate.ToShortDateString().Trim() == "01/01/1753"))
                 {
                     FromOrderDate = Convert.ToDateTime("01/01/1800");
                 }
-                if ((ToOrderDate.ToShortDateString() == "01/01/0001") || (ToOrderDate.ToShortDateString().Trim() == "1/1/0001"))
+                if ((ToOrderDate.ToShortDateString() == "01/01/0001") || (ToOrderDate.ToShortDateString().Trim() == "1/1/0001") || (ToOrderDate.ToShortDateString().Trim() == "1/1/1753") || (ToOrderDate.ToShortDateString().Trim() == "01/01/1753"))
                 {
                     ToOrderDate = Convert.ToDateTime("01/01/1800");
                 }
@@ -719,6 +734,164 @@ namespace ByHandDeliveryApi.Controllers
             catch (Exception e)
             {
                 response.Message = e.Message + " From Date: " + ToOrderDate.ToShortDateString() + " To Date: " + ToOrderDate.ToShortDateString();
+                response.HasError = false;
+            }
+
+            return response.ToHttpResponse();
+        }
+
+
+        [HttpGet("GetOrderDetailsFromLatAndLong")]
+        public IActionResult GetOrderDetailsFromLatAndLong(Decimal  SourceLatitude, Decimal SourceLongitude)
+        {
+
+            DataSet ds = new DataSet();
+
+            List<OrderWithDeliveryDetailsDTO> OrderList = new List<OrderWithDeliveryDetailsDTO>();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            //var response = new GenericResponse<List<OrderDto>>();
+            //var response = new GenericResponse<DataTable>();
+            var response = new GenericResponse<List<OrderWithDeliveryDetailsDTO>>();
+
+            try
+            {
+                using (SqlConnection sql = new SqlConnection(ConnectionString))
+                {
+
+                    using (SqlCommand cmd = new SqlCommand("prSearchOrderDetailsFromLatAndLong", sql))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@sourceLatitude", SourceLatitude));
+                        cmd.Parameters.Add(new SqlParameter("@sourceLongitude", SourceLongitude));
+                        sql.Open();
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(ds);
+                        sql.Close();
+                        ds.Tables[0].TableName = "TblOrders";
+                        ds.Tables[1].TableName = "TblOrderDeliveryAddress";
+
+                        foreach (DataRow Row in ds.Tables[0].Rows)
+                        {
+                            OrderWithDeliveryDetailsDTO ObjOrderWithDetails = new OrderWithDeliveryDetailsDTO();
+
+                            OrderCustomerDTO ObjOrderCustomerDTO = new OrderCustomerDTO();
+                            OrderDeliveryPersonDTO ObjOrderDeliveryPersonDTO = new OrderDeliveryPersonDTO();
+
+                            ObjOrderWithDetails.OrderID = Convert.ToInt32(Row["OrderID"]);
+                            ObjOrderWithDetails.CustomerID = Convert.ToInt32(Row["CustomerID"]);
+
+                            ObjOrderWithDetails.DeliveryPersonID = Convert.ToInt32(Row["DeliveryPersonID"]);
+
+                            ObjOrderWithDetails.PickupLocality = Row["PickupLocality"].ToString();
+                            ObjOrderWithDetails.City = Row["City"].ToString();
+                            ObjOrderWithDetails.MobileNo = Row["MobileNo"].ToString();
+                            ObjOrderWithDetails.PickupFromTime = Convert.ToDateTime(Row["PickupFromTime"]);
+                            ObjOrderWithDetails.PickupToTime = Convert.ToDateTime(Row["PickupToTime"]);
+                            ObjOrderWithDetails.PickupAddress = Row["PickupAddress"].ToString();
+                            ObjOrderWithDetails.ContactPersonMobile = Row["ContactPersonMobile"].ToString();
+                            ObjOrderWithDetails.ContactPerson = Row["ContactPerson"].ToString();
+                            ObjOrderWithDetails.InternalOrderNo = Row["InternalOrderNo"].ToString();
+                            ObjOrderWithDetails.Action = Row["Action"].ToString();
+                            ObjOrderWithDetails.Weight = Row["Weight"].ToString();
+
+                            ObjOrderWithDetails.GoodsType = Row["GoodsType"].ToString();
+                            ObjOrderWithDetails.ParcelValue = Convert.ToInt32(Row["ParcelValue"]);
+                            ObjOrderWithDetails.OrderAmount = Convert.ToInt32(Row["OrderAmount"]);
+                            ObjOrderWithDetails.SecurityFee = Convert.ToInt32(Row["SecurityFee"]);
+                            ObjOrderWithDetails.CommissionFee = Convert.ToInt32(Row["CommissionFee"]);
+                            ObjOrderWithDetails.PaymentTypeID = Convert.ToInt32(Row["PaymentTypeID"]);
+                            ObjOrderWithDetails.PaymentType = Row["PaymentType"].ToString();
+                            ObjOrderWithDetails.OrderStatusID = Convert.ToInt32(Row["OrderStatusID"]);
+                            ObjOrderWithDetails.OrderStatus = Row["OrderStatus"].ToString();
+
+                            ObjOrderWithDetails.PaymentStatusID = Convert.ToInt32(Row["PaymentStatusID"]);
+                            ObjOrderWithDetails.PaymentStatus = Row["PaymentStatus"].ToString();
+                            ObjOrderWithDetails.CreatedDate = Convert.ToDateTime(Row["CreatedDate"]);
+                            ObjOrderWithDetails.FromLat = Convert.ToDecimal(Row["FromLat"]);
+                            ObjOrderWithDetails.FromLong = Convert.ToDecimal(Row["FromLong"]);
+                            ObjOrderWithDetails.PaymentFrom = Row["PaymentFrom"].ToString();
+                            ObjOrderWithDetails.ProductImage = Row["ProductImage"].ToString();
+                            ObjOrderWithDetails.PromoCode = Row["PromoCode"].ToString();
+
+                            ObjOrderWithDetails.Discount = Convert.ToInt32(Row["Discount"]);
+                            ObjOrderWithDetails.PointRedemption = Convert.ToInt32(Row["PointRedemption"]);
+
+                            // Map to the Customer DTO
+                            ObjOrderCustomerDTO.CustomerID = Convert.ToInt32(Row["CustomerID"]);
+                            ObjOrderCustomerDTO.CustomerName = Row["CustomerName"].ToString();
+                            ObjOrderCustomerDTO.CustomerMobileNo = Row["CustomerMobileNo"].ToString();
+                            ObjOrderCustomerDTO.CustomerFCMToken = Row["CustomerFCMToken"].ToString();
+
+                            // Map to the Delivery Person DTO
+                            if (Convert.ToInt32(Row["DeliveryPersonID"]) != 0)
+                            {
+                                ObjOrderDeliveryPersonDTO.DeliveryPersonID = Convert.ToInt32(Row["DeliveryPersonID"]);
+                                ObjOrderDeliveryPersonDTO.DeliveryPersonName = Row["DeliveryPersonName"].ToString();
+                                ObjOrderDeliveryPersonDTO.DeliveryPersonMobileNo = Row["DeliveryPersonMobileNo"].ToString();
+                                ObjOrderDeliveryPersonDTO.DeliveryPersonProfileImage = Row["DeliveryPersonProfileImage"].ToString();
+                                ObjOrderDeliveryPersonDTO.DeliveryPersonFCMToken = Row["DeliveryPersonFCMToken"].ToString();
+                                ObjOrderWithDetails.DeliveryPerson = ObjOrderDeliveryPersonDTO;
+                            }
+                            else
+                            {
+                                ObjOrderWithDetails.DeliveryPerson = null;
+                            }
+                            int i = 0;
+                            DataRow[] dr = ds.Tables[1].Select("OrderID = " + ObjOrderWithDetails.OrderID);
+                            int j = dr.Count();
+                            OrderDeliveryAddDto[] ObjOrderDeliveryAddDTO = new OrderDeliveryAddDto[j];
+                            foreach (DataRow DeliveryAddressRow in ds.Tables[1].Select("OrderID = " + ObjOrderWithDetails.OrderID))
+                            {
+                                OrderDeliveryAddDto ObjOrderDeliveryAdd = new OrderDeliveryAddDto();
+
+                                ObjOrderDeliveryAdd.OrderDeliveryAddressID = Convert.ToInt32(DeliveryAddressRow["OrderDeliveryAddressID"]);
+                                ObjOrderDeliveryAdd.OrderID = Convert.ToInt32(DeliveryAddressRow["OrderID"]);
+                                ObjOrderDeliveryAdd.DropLocality = DeliveryAddressRow["DropLocality"].ToString();
+                                ObjOrderDeliveryAdd.MobileNo = DeliveryAddressRow["MobileNo"].ToString();
+                                ObjOrderDeliveryAdd.DeliveryFromTime = Convert.ToDateTime(DeliveryAddressRow["DeliveryFromTime"]);
+                                ObjOrderDeliveryAdd.DeliveryToTime = Convert.ToDateTime(DeliveryAddressRow["DeliveryToTime"]);
+                                ObjOrderDeliveryAdd.DeliveryAddress = DeliveryAddressRow["DeliveryAddress"].ToString();
+                                ObjOrderDeliveryAdd.ContactPerson = DeliveryAddressRow["ContactPerson"].ToString();
+                                ObjOrderDeliveryAdd.InternalOrderNo = DeliveryAddressRow["InternalOrderNo"].ToString();
+                                ObjOrderDeliveryAdd.Action = DeliveryAddressRow["Action"].ToString();
+                                ObjOrderDeliveryAdd.Latitude = Convert.ToDecimal(DeliveryAddressRow["Latitude"]);
+                                ObjOrderDeliveryAdd.Longitude = Convert.ToDecimal(DeliveryAddressRow["Longitude"]);
+                                ObjOrderDeliveryAdd.ApproxDistance = Convert.ToDecimal(DeliveryAddressRow["ApproxDistance"]);
+                                ObjOrderDeliveryAdd.ApproxTime = (TimeSpan)DeliveryAddressRow["ApproxTime"];
+                                ObjOrderDeliveryAdd.ProductImage = DeliveryAddressRow["ProductImage"].ToString();
+                                ObjOrderDeliveryAddDTO[i] = ObjOrderDeliveryAdd;
+                                i++;
+                            }
+                            ObjOrderWithDetails.Customer = ObjOrderCustomerDTO;
+                            ObjOrderWithDetails.OrderDeliveryAdd = ObjOrderDeliveryAddDTO;
+                            OrderList.Add(ObjOrderWithDetails);
+                        }
+
+                        if (ds.Tables[0].Rows.Count == 0)
+                        {
+                            response.Message = "No Orders Found";
+                        }
+                        else
+                        {
+                            // List<OrderWithDeliveryDetailsDTO>ObjOrderDetails = (ObjOrderWithDetails as IEnumerable<OrderWithDeliveryDetailsDTO>).Cast<OrderWithDeliveryDetailsDTO>().ToList();
+
+
+                            // response.Message = SucessMessege + " From Date: " + ToOrderDate.ToShortDateString() + " To Date: " + ToOrderDate.ToShortDateString();
+                            response.Message = SucessMessege;
+                        }
+                        response.Result = OrderList;
+                        response.HasError = false;
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                response.Message = e.Message ;
                 response.HasError = false;
             }
 

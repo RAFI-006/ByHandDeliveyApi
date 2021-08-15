@@ -1,5 +1,4 @@
-﻿
-using ByHandDeliveryApi.DataModel.GooglePlaces;
+﻿using ByHandDeliveryApi.DataModel.GooglePlaces;
 using System;
 using ByHandDeliveryApi.Services.RequestProvider;
 using System.Collections.Generic;
